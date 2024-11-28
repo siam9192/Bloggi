@@ -1,0 +1,331 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id Int @id  @default(autoincrement())
+  role UserRole
+  email String?
+  password String?
+  google_id String?
+  provider Provider
+  status UserStatus @default(Active)
+  author Author?
+  reader Reader?
+  staff Staff?
+  join_date DateTime @default(now())
+  updated_at DateTime @updatedAt
+  comments Comment[]
+  subscriptions Subscription[]
+  payments Payment[]
+  @@map("users")
+}
+
+
+
+
+
+model Reader {
+   id Int @id  @default(autoincrement())
+   user_id Int @unique
+   user  User @relation(fields: [user_id],references: [id])
+   first_name String
+   last_name String
+   profile_photo String?
+   following Follower[]
+   @@map("readers")
+}
+
+
+
+
+
+model Author {
+   id Int @id  @default(autoincrement())
+   user_id Int @unique
+   user  User @relation(fields: [user_id],references: [id])
+   first_name String
+   last_name String
+   profile_photo String
+   bio String
+   social_links SocialLink[]
+   blogs Blog[]
+   followers Follower[]
+   updated_at DateTime @updatedAt
+   @@map("authors")
+}
+
+
+
+model Staff {
+    id Int @id  @default(autoincrement())
+    user_id Int @unique
+    user  User @relation(fields: [user_id],references: [id])
+    first_name String
+    last_name String
+    profile_photo String?
+    updated_at DateTime @updatedAt
+    @@map("staffs")
+}
+
+model SocialLink {
+  author_id    Int                                      
+  author Author @relation(fields: [author_id],references: [id])   
+  platform  SocialPlatform
+  url       String   
+  created_at DateTime @default(now())             
+  updated_at DateTime @updatedAt   
+  @@id([author_id,platform])   
+  @@map("social_links")           
+}
+
+
+
+
+model Blog{
+  id Int @id  @default(autoincrement())
+  author_id Int 
+  author Author @relation(fields: [author_id],references: [id])
+  title String 
+  content String
+  short_description String 
+  category_id Int
+  category Category @relation(fields: [category_id],references: [id])
+  featured_image String
+  is_premium Boolean @default(false)
+  tags  BlogTag[]
+  publish_date DateTime
+  privacy_status BlogPrivacyStatus
+  status BlogStatus
+  views_count Int @default(0) 
+  likes_count Int @default(0)
+  dislikes_count Int @default(0)
+  reactions BlogReaction[]
+  comments Comment[]
+  @@map("blogs")
+}
+
+model BlogTag {
+  id Int @id  @default(autoincrement())
+  blog_id Int
+  name String
+  title Blog @relation(fields: [blog_id],references: [id],onDelete:Cascade)
+  @@map("blog_tags")
+}
+
+model ParentCategory {
+  id Int @id  @default(autoincrement())
+  name String
+  image_url String
+  child_categories Category[] 
+  @@map("parent_categories")
+}
+
+
+model Category {
+   id Int @id  @default(autoincrement())
+   name String
+   parent_id Int
+   parent ParentCategory @relation(fields: [parent_id],references: [id],onDelete: Cascade)
+   blogs Blog[]
+   @@map("categories")
+}
+
+
+model Follower {
+  follower_id Int                                      // User who follows
+  following_id Int  
+  follower Reader @relation(fields: [follower_id],references: [id])
+  following Author @relation(fields: [following_id],references: [id])
+  created_at DateTime @default(now())                                   // User being followed
+  @@id([follower_id,following_id])
+  @@map("followers")
+}
+
+
+model Bookmark {
+  post_id Int
+  user_id Int
+  is_starred Boolean @default(false)
+  created_at DateTime @default(now())
+  @@id([post_id,user_id])
+  @@map("bookmarks")
+}
+
+
+
+model Comment {
+  id Int @id  @default(autoincrement())
+  content String
+  user_id Int 
+  blog_id Int
+  parent_id Int?
+  parent Comment? @relation("comment_replies",fields: [parent_id],references: [id],onDelete:Cascade ) 
+  replies Comment[] @relation("comment_replies")
+  user User @relation(fields: [user_id],references: [id])
+  blog Blog @relation(fields: [blog_id],references: [id],onDelete: Cascade)
+  created_at DateTime @default(now())
+  reactions CommentReaction[]
+  @@map("comments")
+}
+
+
+model BlogReaction {
+ type ReactionType
+ blog_id Int
+ user_id Int
+ post Blog @relation(fields: [blog_id],references: [id],onDelete: Cascade)
+ @@id([blog_id,user_id])
+ @@map("blog_reactions")
+}
+
+model CommentReaction {
+ type ReactionType
+ comment_id Int
+ user_id Int
+ comment Comment @relation(fields: [comment_id],references: [id],onDelete: Cascade)
+ @@id([comment_id,user_id])
+ @@map("comment_reactions")
+}
+
+
+
+model Package {
+   id Int @id  @default(autoincrement())
+   name String 
+   price Int
+   discount Int
+   discount_type PackageDiscountType
+   features PackageFeature[]
+   validity_days Int
+   created_at DateTime @default(now())
+   updated_at DateTime @updatedAt
+   subscriptions Subscription[]
+   @@map("packages")
+}
+
+
+
+model PackageFeature {
+  id Int @id  @default(autoincrement())
+  package_id Int
+  name String
+  status PackageFeatureStatus
+  package Package @relation(fields: [package_id],references: [id])
+  @@map("package_features")
+}
+
+model Payment {
+   id Int @id  @default(autoincrement())
+   user_id Int
+   amount Int
+   method PaymentMethod
+   status PaymentStatus
+   user User @relation(fields: [user_id],references: [id])
+   subscription Subscription?
+   created_at DateTime @default(now())
+   updated_at DateTime @updatedAt
+   @@map("payments")
+}
+
+
+model Subscription {
+    id Int @id  @default(autoincrement())
+    user_id Int
+    payment_id Int @unique
+    package_id Int
+    status SubscriptionStatus @default(Active)
+    expire_at DateTime
+    user User @relation(fields: [user_id],references: [id])
+    payment Payment @relation(fields: [payment_id],references: [id])
+    package Package @relation(fields: [package_id],references: [id])
+    created_at DateTime @default(now())
+    @@map("subscriptions")
+}
+
+
+
+
+enum UserRole {
+    SuperAdmin
+    Admin
+    Moderator 
+    Author 
+    Contributor
+    Reader
+    Guest
+}
+
+enum Provider {
+  Google
+  Email
+}
+
+enum UserStatus {
+  Active
+  Blocked
+  Deleted
+}
+
+enum BlogStatus {
+  Draft
+  Published
+  Archived
+}
+
+enum BlogPrivacyStatus {
+  Public
+  Private
+}
+
+enum SocialPlatform {
+  Facebook
+  Instagram
+  Twitter
+  Linkedin
+  Youtube
+}
+
+enum ReactionType {
+  Like
+  Dislike
+}
+
+enum PackageDiscountType {
+  Percentage
+  Fixed
+}
+
+enum PackageFeatureStatus {
+  Available
+  Unavailable
+}
+
+enum SubscriptionStatus {
+  Active
+  Inactive
+  Expired
+}
+
+enum PaymentMethod {
+  Stripe
+  Paypal
+  Bkash
+  Nagad
+}
+
+
+enum PaymentStatus {
+  Processing
+  Success
+  Failed 
+  Canceled
+}
+
