@@ -3,7 +3,6 @@ import catchAsync from "../../shared/catchAsync";
 import httpStatus from "../../shared/http-status";
 import { sendSuccessResponse } from "../../shared/response";
 import ProfileServices from "./profile.service";
-import validateRequest from "../../middlewares/validateRequest";
 
 const getUserProfileById = catchAsync(async (req: Request, res: Response) => {
   const result = await ProfileServices.getUserProfileByIdFromDB(req.params.id);

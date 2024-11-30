@@ -5,6 +5,9 @@ import ProfileRouter from "../modules/Profile/profile.route";
 import BlogRouter from "../modules/Blog/blog.route";
 import ParentCategoryRouter from "../modules/ParentCategory/parent-category.route";
 import CategoryRouter from "../modules/Category/category.route";
+import FollowerRouter from "../modules/Follower/follower.route";
+import BookmarkRouter from "../modules/Bookmark/bookmark.route";
+import CommentRouter from "../modules/Comment/comment.route";
 
 const router = Router();
 
@@ -34,6 +37,18 @@ const moduleRoutes: TModuleRoutes = [
   {
     path: "/categories",
     router: CategoryRouter,
+  },
+  {
+    path: "/followers",
+    router: FollowerRouter,
+  },
+  {
+    path: "/bookmarks",
+    router: BookmarkRouter,
+  },
+  {
+    path: "/comments",
+    router: CommentRouter,
   },
 ];
 

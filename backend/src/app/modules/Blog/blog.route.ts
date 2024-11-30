@@ -21,8 +21,6 @@ router.get("/author", auth(UserRole.Author), BlogControllers.getAuthorAllBlogs);
 router.get("/:id", BlogControllers.getBlogForReadById);
 router.delete("/:id", BlogControllers.deleteBlogById);
 
-
-
 const BlogRouter = router;
 
 export default BlogRouter;

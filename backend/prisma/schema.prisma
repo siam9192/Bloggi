@@ -22,9 +22,9 @@ model User {
   staff Staff?
   join_date DateTime @default(now())
   updated_at DateTime @updatedAt
-  comments Comment[]
   subscriptions Subscription[]
   payments Payment[]
+  bookmarks Bookmark[]
   @@map("users")
 }
 
@@ -40,6 +40,7 @@ model Reader {
    last_name String
    profile_photo String?
    following Follower[]
+   commnets Comment[]
    @@map("readers")
 }
 
@@ -109,6 +110,7 @@ model Blog{
   dislikes_count Int @default(0)
   reactions BlogReaction[]
   comments Comment[]
+  bookmarks Bookmark[]
   @@map("blogs")
 }
 
@@ -140,22 +142,24 @@ model Category {
 
 
 model Follower {
-  follower_id Int                                      // User who follows
-  following_id Int  
-  follower Reader @relation(fields: [follower_id],references: [id])
-  following Author @relation(fields: [following_id],references: [id])
+  reader_id Int                                      // User who follows
+  author_id Int  
+  reader Reader @relation(fields: [reader_id],references: [id])
+  author Author @relation(fields: [author_id],references: [id])
   created_at DateTime @default(now())                                   // User being followed
-  @@id([follower_id,following_id])
+  @@id([reader_id,author_id])
   @@map("followers")
 }
 
 
 model Bookmark {
-  post_id Int
+  blog_id Int
+  blog Blog @relation(fields: [blog_id],references: [id])
   user_id Int
+  user User @relation(fields: [user_id],references: [id])
   is_starred Boolean @default(false)
   created_at DateTime @default(now())
-  @@id([post_id,user_id])
+  @@id([blog_id,user_id])
   @@map("bookmarks")
 }
 
@@ -164,14 +168,15 @@ model Bookmark {
 model Comment {
   id Int @id  @default(autoincrement())
   content String
-  user_id Int 
+  reader_id Int 
   blog_id Int
   parent_id Int?
   parent Comment? @relation("comment_replies",fields: [parent_id],references: [id],onDelete:Cascade ) 
   replies Comment[] @relation("comment_replies")
-  user User @relation(fields: [user_id],references: [id])
+  reader Reader @relation(fields: [reader_id],references: [id])
   blog Blog @relation(fields: [blog_id],references: [id],onDelete: Cascade)
   created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   reactions CommentReaction[]
   @@map("comments")
 }

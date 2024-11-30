@@ -25,7 +25,8 @@ const getBlogs = catchAsync(async (req: Request, res: Response) => {
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blogs retrieved successfully",
-    data: result,
+    meta: result.meta,
+    data: result.data,
   });
 });
 
@@ -63,7 +64,9 @@ const getRecentBlogs = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getTrendingBlogs = catchAsync(async (req: Request, res: Response) => {
-  const result = await BlogService.getTrendingBlogsFromDB(req.params.categoryId);
+  const result = await BlogService.getTrendingBlogsFromDB(
+    req.params.categoryId,
+  );
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blogs retrieved successfully",
@@ -98,7 +101,6 @@ const BlogControllers = {
   getBlogForReadById,
   deleteBlogById,
   updateBlogById,
-
 };
 
 export default BlogControllers;

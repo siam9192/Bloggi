@@ -62,7 +62,7 @@ const getBlogsFromDB = async (
 ) => {
   const { searchTerm, categories } = query;
 
-  const { limit, skip } = calculatePagination(options);
+  const { limit, skip, page } = calculatePagination(options);
 
   const andConditions: Prisma.BlogWhereInput[] = [];
 
@@ -109,13 +109,6 @@ const getBlogsFromDB = async (
 
   const data = await prisma.blog.findMany({
     where: whereConditions,
-    // select:{
-    //   title:true,
-    //   short_description:true,
-    //   featured_image:true,
-    //   likes_count:true,
-    //   dislikes_count:true
-    // },
     skip,
     take: limit,
     orderBy:
@@ -157,7 +150,20 @@ const getBlogsFromDB = async (
     };
   });
 
-  return result;
+  const total = await prisma.blog.count({
+    where: whereConditions,
+  });
+
+  const meta = {
+    page,
+    limit,
+    total,
+  };
+
+  return {
+    data: result,
+    meta,
+  };
 };
 
 const getBlogForReadByIdFromDB = async (
@@ -402,69 +408,65 @@ const getRecentBlogsFromDB = async () => {
       publish_date: {
         lte: new Date(),
       },
-      status:'Published'
+      status: "Published",
     },
-    include:{
-      author:true,
-      category:{
-        select:{
-          name:true
-        }
-      }
+    include: {
+      author: true,
+      category: {
+        select: {
+          name: true,
+        },
+      },
     },
     take: 12,
     orderBy: {
       publish_date: "desc",
     },
   });
-  const result = blogsResultFormat(blogs as any)
-  return result
+  const result = blogsResultFormat(blogs as any);
+  return result;
 };
 
-const getTrendingBlogsFromDB = async (categoryId:string|number) => {
+const getTrendingBlogsFromDB = async (categoryId: string | number) => {
   // Typecast category id string => number
-  categoryId = Number(categoryId)
-  console.log(categoryId)
- 
-  const whereConditions:Prisma.BlogWhereInput = {
+  categoryId = Number(categoryId);
+  console.log(categoryId);
+
+  const whereConditions: Prisma.BlogWhereInput = {
     publish_date: {
       lte: new Date(),
     },
-    status:'Published'
-  }
+    status: "Published",
+  };
 
-  if(categoryId && typeof categoryId  === 'number'){
-    whereConditions.category_id = categoryId
+  if (categoryId && typeof categoryId === "number") {
+    whereConditions.category_id = categoryId;
   }
-
 
   const blogs = await prisma.blog.findMany({
-    where:whereConditions,
-    include:{
-      author:{
-        select:{
-          first_name:true,
-          last_name:true,
-          profile_photo:true
-        }
+    where: whereConditions,
+    include: {
+      author: {
+        select: {
+          first_name: true,
+          last_name: true,
+          profile_photo: true,
+        },
       },
-      category:{
-        select:{
-          name:true
-        }
-      }
+      category: {
+        select: {
+          name: true,
+        },
+      },
     },
     take: 12,
     orderBy: {
       views_count: "desc",
     },
-    
   });
- const result = blogsResultFormat(blogs as any)
-  return result
+  const result = blogsResultFormat(blogs as any);
+  return result;
 };
-
-
 
 const BlogService = {
   createBlogIntoDB,
@@ -474,7 +476,7 @@ const BlogService = {
   updateBlogByIdFromDB,
   getAuthorAllBlogsFromDB,
   getRecentBlogsFromDB,
-  getTrendingBlogsFromDB
+  getTrendingBlogsFromDB,
 };
 
 export default BlogService;
