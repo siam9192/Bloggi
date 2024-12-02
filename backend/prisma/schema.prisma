@@ -194,9 +194,9 @@ model BlogReaction {
 model CommentReaction {
  type ReactionType
  comment_id Int
- user_id Int
+ reader_id Int
  comment Comment @relation(fields: [comment_id],references: [id],onDelete: Cascade)
- @@id([comment_id,user_id])
+ @@id([reader_id,comment_id])
  @@map("comment_reactions")
 }
 
@@ -229,6 +229,7 @@ model PackageFeature {
 
 model Payment {
    id Int @id  @default(autoincrement())
+   transaction_id String
    user_id Int
    amount Int
    method PaymentMethod
@@ -309,8 +310,8 @@ enum PackageDiscountType {
 }
 
 enum PackageFeatureStatus {
-  Available
-  Unavailable
+  Included
+  Not_Included
 }
 
 enum SubscriptionStatus {
@@ -328,7 +329,7 @@ enum PaymentMethod {
 
 
 enum PaymentStatus {
-  Processing
+  Pending
   Success
   Failed 
   Canceled

@@ -8,6 +8,9 @@ import CategoryRouter from "../modules/Category/category.route";
 import FollowerRouter from "../modules/Follower/follower.route";
 import BookmarkRouter from "../modules/Bookmark/bookmark.route";
 import CommentRouter from "../modules/Comment/comment.route";
+import CommentReactionRouter from "../modules/CommentReaction/comment-reaction.route";
+import PackageRouter from "../modules/Package/package.route";
+import SubscriptionRouter from "../modules/Subscription/subscription.route";
 
 const router = Router();
 
@@ -49,6 +52,18 @@ const moduleRoutes: TModuleRoutes = [
   {
     path: "/comments",
     router: CommentRouter,
+  },
+  {
+    path: "/comments-reaction",
+    router: CommentReactionRouter,
+  },
+  {
+    path: "/packages",
+    router: PackageRouter,
+  },
+  {
+    path: "/subscriptions",
+    router: SubscriptionRouter,
   },
 ];
 

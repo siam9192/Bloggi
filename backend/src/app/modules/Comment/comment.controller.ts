@@ -61,27 +61,25 @@ const getComments = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 const getCommentReplies = catchAsync(async (req: Request, res: Response) => {
-   
-    const result = await CommentServices.getBlogCommentRepliesFromDB(req.params.commentId)
-  
-    sendSuccessResponse(res, {
-      statusCode: httpStatus.CREATED,
-      message: "Comment replies retrieved successfully",
-      data: result,
-    });
-  });
-  
+  const result = await CommentServices.getBlogCommentRepliesFromDB(
+    req.params.commentId,
+  );
 
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.CREATED,
+    message: "Comment replies retrieved successfully",
+    data: result,
+  });
+});
 
 const CommentControllers = {
-    createComment,
-    createCommentReplay,
-    getComments,
-    getCommentReplies,
-    deleteComment,
-    updateComment
-}
+  createComment,
+  createCommentReplay,
+  getComments,
+  getCommentReplies,
+  deleteComment,
+  updateComment,
+};
 
-export default CommentControllers
+export default CommentControllers;

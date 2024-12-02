@@ -100,18 +100,18 @@ const getBlogCommentsFromDB = async (
     orderBy: {
       [sortBy]: orderBy,
     },
-  include:{
-    _count:{
-      select:{
-        replies:true,
-        reactions:{
-          where:{
-            type:'Like'
-          }
-        }
-      }
-    }
-  }
+    include: {
+      _count: {
+        select: {
+          replies: true,
+          reactions: {
+            where: {
+              type: "Like",
+            },
+          },
+        },
+      },
+    },
   });
 
   // const commentReactions = await prisma.commentReaction.groupBy({
@@ -120,13 +120,12 @@ const getBlogCommentsFromDB = async (
   //     comment_id:true
   //   }
   //   });
-  
+
   //   console.log(commentReactions)
 
   const total = await prisma.comment.count({
     where: whereConditions,
   });
-
 
   return {
     data,
