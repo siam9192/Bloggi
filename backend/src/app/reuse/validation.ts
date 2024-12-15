@@ -6,3 +6,5 @@ export const NameValidationSchema = z.object({
 });
 
 export const PasswordValidation = z.string().min(6).max(32);
+
+export const ReactionTypeValidation = z.enum(["Like", "Dislike"]).nullable();

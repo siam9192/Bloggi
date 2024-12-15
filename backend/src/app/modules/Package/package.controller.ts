@@ -22,11 +22,9 @@ const getPackages = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
-
 const PackageControllers = {
-    createPackage,
-    getPackages
-}
+  createPackage,
+  getPackages,
+};
 
-export default PackageControllers
+export default PackageControllers;

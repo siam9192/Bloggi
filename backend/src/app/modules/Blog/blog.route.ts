@@ -4,6 +4,7 @@ import BlogValidations from "./blog.validation";
 import BlogControllers from "./blog.controller";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
+import authProvider from "../../middlewares/authProvider";
 
 const router = Router();
 
@@ -14,11 +15,11 @@ router.post(
   BlogControllers.createBlog,
 );
 
-router.get("/", BlogControllers.getBlogs);
+router.get("/",BlogControllers.getBlogs);
 router.get("/recent", BlogControllers.getRecentBlogs);
 router.get("/trending/:categoryId", BlogControllers.getTrendingBlogs);
 router.get("/author", auth(UserRole.Author), BlogControllers.getAuthorAllBlogs);
-router.get("/:id", BlogControllers.getBlogForReadById);
+router.get("/:slug",authProvider(...Object.values(UserRole)),BlogControllers.getBlogForReadById);
 router.delete("/:id", BlogControllers.deleteBlogById);
 
 const BlogRouter = router;

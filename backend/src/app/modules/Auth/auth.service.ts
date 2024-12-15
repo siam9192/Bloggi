@@ -14,7 +14,6 @@ const SignUp = async (data: ISignUpData) => {
       email: data.email,
     },
   });
-
   //  Check user existence
   if (user) {
     throw new AppError(
@@ -99,7 +98,7 @@ const Login = async (data: ILoginData) => {
 };
 
 const getAccessToken = async (res: Response) => {
-  // const refreshToken = res.cookie[]
+  // const refreshToken = res.cookie['']
 };
 
 const AuthServices = {

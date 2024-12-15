@@ -3,13 +3,20 @@ import { IPaginationOptions } from "../../interfaces/pagination";
 import prisma from "../../shared/prisma";
 import {
   ICategoryFilterRequest,
-  ICreateCategoryData,
+  ICreateCategoryPayload,
 } from "./category.interface";
 import { calculatePagination } from "../../helpers/paginationHelper";
+import { generateSlug } from "../../utils/function";
 
-const createCategoryIntoDB = async (data: ICreateCategoryData) => {
+const createCategoryIntoDB = async (payload: ICreateCategoryPayload) => {
+  const data = {
+    ...payload,
+    slug:generateSlug(payload.name)
+  }
+
+
   return await prisma.category.create({
-    data: data,
+    data:data,
   });
 };
 

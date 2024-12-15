@@ -4,9 +4,8 @@ import httpStatus from "../../shared/http-status";
 import { sendSuccessResponse } from "../../shared/response";
 import SubscriptionServices from "./subscription.service";
 
-
 const purchasePackage = catchAsync(async (req: Request, res: Response) => {
-  const result = await SubscriptionServices.purchasePackage(req.user,req.body);
+  const result = await SubscriptionServices.purchasePackage(req.user, req.body);
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Payment url retrieved successfully",
@@ -14,11 +13,8 @@ const purchasePackage = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
-
 const subscriptionControllers = {
-    purchasePackage
-}
+  purchasePackage,
+};
 
-
-export default subscriptionControllers
+export default subscriptionControllers;

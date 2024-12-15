@@ -46,7 +46,7 @@ const getAuthorAllBlogs = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getBlogForReadById = catchAsync(async (req: Request, res: Response) => {
-  const result = await BlogService.getBlogForReadByIdFromDB(req.params.id);
+  const result = await BlogService.getBlogForReadBySlugFromDB(req.user,req.params.slug);
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blog retrieved successfully",

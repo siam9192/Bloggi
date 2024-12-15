@@ -1,6 +1,6 @@
 import { BlogPrivacyStatus, BlogStatus } from "@prisma/client";
 
-export interface ICreateBlogData {
+export interface ICreateBlogPayload {
   title: string;
   content: string;
   short_description: string;
@@ -10,7 +10,7 @@ export interface ICreateBlogData {
   tags: string[];
   publish_date: Date;
   privacy_status: `${BlogPrivacyStatus}`;
-  status: `${BlogStatus}`;
+  status: `${BlogStatus}`
 }
 
 export interface IUpdateBlogData {

@@ -5,11 +5,14 @@ import PackageControllers from "./package.controller";
 
 const router = Router();
 
-router.post("/",validateRequest(PackageValidations.CreatePackage),PackageControllers.createPackage)
+router.post(
+  "/",
+  validateRequest(PackageValidations.CreatePackage),
+  PackageControllers.createPackage,
+);
 
-router.get("/",PackageControllers.getPackages)
+router.get("/", PackageControllers.getPackages);
 
 const PackageRouter = router;
 
 export default PackageRouter;
-

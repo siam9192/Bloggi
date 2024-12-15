@@ -65,7 +65,7 @@ function auth(...requiredRoles: UserRole[]) {
       throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized  !");
     }
 
-    req.user = decoded as { id: string; role: UserRole };
+    req.user = decoded as { id: number; role: UserRole };
 
     next();
   });

@@ -11,6 +11,8 @@ import CommentRouter from "../modules/Comment/comment.route";
 import CommentReactionRouter from "../modules/CommentReaction/comment-reaction.route";
 import PackageRouter from "../modules/Package/package.route";
 import SubscriptionRouter from "../modules/Subscription/subscription.route";
+import PaymentRouter from "../modules/Payment/payment.route";
+import BlogReactionRouter from "../modules/BlogReaction/blog-reaction.route";
 
 const router = Router();
 
@@ -58,12 +60,20 @@ const moduleRoutes: TModuleRoutes = [
     router: CommentReactionRouter,
   },
   {
+    path: "/blogs-reaction",
+    router: BlogReactionRouter,
+  },
+  {
     path: "/packages",
     router: PackageRouter,
   },
   {
     path: "/subscriptions",
     router: SubscriptionRouter,
+  },
+  {
+    path: "/payments",
+    router: PaymentRouter,
   },
 ];
 

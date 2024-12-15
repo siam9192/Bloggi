@@ -9,8 +9,11 @@
     "express": "^4.21.1",
     "http-status": "^2.0.0",
     "http-status-codes": "^2.3.0",
+    "i": "^0.3.7",
     "jsonwebtoken": "^9.0.2",
+    "npm": "^10.9.2",
     "prettier": "^3.3.3",
+    "sslcommerz-lts": "^1.1.0",
     "stripe": "^17.4.0",
     "zod": "^3.23.8"
   },

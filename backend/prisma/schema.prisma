@@ -12,7 +12,7 @@ datasource db {
 model User {
   id Int @id  @default(autoincrement())
   role UserRole
-  email String?
+  email String @unique
   password String?
   google_id String?
   provider Provider
@@ -22,7 +22,6 @@ model User {
   staff Staff?
   join_date DateTime @default(now())
   updated_at DateTime @updatedAt
-  subscriptions Subscription[]
   payments Payment[]
   bookmarks Bookmark[]
   @@map("users")
@@ -40,7 +39,9 @@ model Reader {
    last_name String
    profile_photo String?
    following Follower[]
-   commnets Comment[]
+   comments Comment[]
+   subscriptions Subscription[]
+   blog_read_history BlogReadHistory[]
    @@map("readers")
 }
 
@@ -102,6 +103,7 @@ model Blog{
   featured_image String
   is_premium Boolean @default(false)
   tags  BlogTag[]
+  slug String @unique
   publish_date DateTime
   privacy_status BlogPrivacyStatus
   status BlogStatus
@@ -111,6 +113,7 @@ model Blog{
   reactions BlogReaction[]
   comments Comment[]
   bookmarks Bookmark[]
+  blog_read_histories BlogReadHistory[]
   @@map("blogs")
 }
 
@@ -122,20 +125,24 @@ model BlogTag {
   @@map("blog_tags")
 }
 
-model ParentCategory {
-  id Int @id  @default(autoincrement())
-  name String
-  image_url String
-  child_categories Category[] 
-  @@map("parent_categories")
-}
+// model ParentCategory {
+//   id Int @id  @default(autoincrement())
+//   name String
+//   image_url String
+//   child_categories Category[] 
+//   @@map("parent_categories")
+// }
 
 
 model Category {
    id Int @id  @default(autoincrement())
    name String
-   parent_id Int
-   parent ParentCategory @relation(fields: [parent_id],references: [id],onDelete: Cascade)
+   slug String @unique
+   image_url String?
+   description String? @db.VarChar(1000)
+   parent_id Int?
+   parent Category? @relation("child_categories",fields: [parent_id],references: [id],onDelete:Cascade ) 
+   children Category[] @relation("child_categories")
    blogs Blog[]
    @@map("categories")
 }
@@ -185,9 +192,9 @@ model Comment {
 model BlogReaction {
  type ReactionType
  blog_id Int
- user_id Int
+ reader_id Int
  post Blog @relation(fields: [blog_id],references: [id],onDelete: Cascade)
- @@id([blog_id,user_id])
+ @@id([blog_id,reader_id])
  @@map("blog_reactions")
 }
 
@@ -227,6 +234,7 @@ model PackageFeature {
   @@map("package_features")
 }
 
+
 model Payment {
    id Int @id  @default(autoincrement())
    transaction_id String
@@ -244,16 +252,29 @@ model Payment {
 
 model Subscription {
     id Int @id  @default(autoincrement())
-    user_id Int
+    reader_id Int
     payment_id Int @unique
     package_id Int
     status SubscriptionStatus @default(Active)
-    expire_at DateTime
-    user User @relation(fields: [user_id],references: [id])
+    start_at DateTime
+    end_at DateTime
+    reader Reader @relation(fields: [reader_id],references: [id])
     payment Payment @relation(fields: [payment_id],references: [id])
     package Package @relation(fields: [package_id],references: [id])
     created_at DateTime @default(now())
     @@map("subscriptions")
+}
+
+model BlogReadHistory {
+  reader_id Int
+  blog_id Int
+  count Int @default(1)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  reader Reader @relation(fields: [reader_id],references: [id],onDelete: Cascade)
+  blog Blog @relation(fields: [blog_id],references: [id],onDelete: Cascade)
+  @@id([reader_id,blog_id])
+  @@map("blog_read_histories")
 }
 
 
@@ -323,6 +344,7 @@ enum SubscriptionStatus {
 enum PaymentMethod {
   Stripe
   Paypal
+  SSL
   Bkash
   Nagad
 }

@@ -1,8 +1,8 @@
-import { Blog, Prisma } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 import prisma from "../../shared/prisma";
 import {
   IBlogFilterOptions,
-  ICreateBlogData,
+  ICreateBlogPayload,
   IUpdateBlogData,
 } from "./blog.interface";
 import { IPaginationOptions } from "../../interfaces/pagination";
@@ -11,15 +11,16 @@ import AppError from "../../Errors/AppError";
 import httpStatus from "../../shared/http-status";
 import { IAuthUser } from "../Auth/auth.interface";
 import { blogsResultFormat } from "./blog,constant";
+import { generateSlug } from "../../utils/function";
 
-const createBlogIntoDB = async (userId: number, data: ICreateBlogData) => {
+const createBlogIntoDB = async (userId: number, payload: ICreateBlogPayload) => {
   const authorData = await prisma.author.findUniqueOrThrow({
     where: {
       user_id: userId,
     },
   });
 
-  const { tags, ...othersBlogData } = data;
+  const { tags, ...othersBlogData } = payload;
 
   // Check category existence
   await prisma.category.findUniqueOrThrow({
@@ -27,22 +28,59 @@ const createBlogIntoDB = async (userId: number, data: ICreateBlogData) => {
       id: othersBlogData.category_id,
     },
   });
-
+  
   const result = await prisma.$transaction(async (trClient) => {
     othersBlogData.publish_date = new Date();
     othersBlogData.category_id = 1;
+     
+    let slug = generateSlug(payload.title);
+    // let counter =
+    const blog = await trClient.blog.findUnique({
+      where:{
+        slug
+      },
+      select:{
+        id:true
+      }
+    })
+
+    if(blog){
+      let counter = 1;
+      while(true){
+       const newSlug =  generateSlug(payload.title+" "+counter)
+       const blog = await trClient.blog.findUnique({
+        where:{
+          slug:newSlug
+        },
+        select:{
+          id:true
+        }
+      })
+      if(!blog){
+        slug = newSlug
+        break;
+      }
+      }
+  
+    }
+
+    
+    // Create blog
     const createdBlog = await trClient.blog.create({
       data: {
         author_id: authorData.id,
         ...othersBlogData,
+        slug
       },
     });
-
-    const tags = data.tags.map((tag) => ({
+    
+  
+    const tags = payload.tags.map((tag) => ({
       name: tag,
       blog_id: createdBlog.id,
     }));
-
+     
+      // Create blog tags
     const createdBlogs = await trClient.blogTag.createMany({
       data: tags,
     });
@@ -166,15 +204,15 @@ const getBlogsFromDB = async (
   };
 };
 
-const getBlogForReadByIdFromDB = async (
-  // user: IAuthUser,
-  id: string | number,
+const getBlogForReadBySlugFromDB = async (
+  authUser: IAuthUser,
+  slug:string
 ) => {
-  id = Number(id);
 
+  // Find blog by slug 
   const blog = await prisma.blog.findUnique({
     where: {
-      id: id,
+     slug
     },
     include: {
       author: {
@@ -192,28 +230,63 @@ const getBlogForReadByIdFromDB = async (
     throw new AppError(httpStatus.NOT_FOUND, "Blog not found");
   }
 
-  // // Check is user role is reader and is the blog is premium
-  // if (user.role === "Reader" && blog.is_premium) {
-  //   const user = await prisma.user.findUnique({
-  //     where: {
-  //       id,
-  //     },
-  //     include: {
-  //       subscriptions: {
-  //         orderBy: {
-  //           created_at: "desc",
-  //         },
-  //         take:1
-  //       },
-  //     },
-  //   });
 
-  //   const latest_subscription =  user?.subscriptions[0]
-  // }
+   // Check is user role is reader and is the blog is premium
+   if (authUser && authUser.role === UserRole.Reader) {
 
+    const reader = await prisma.reader.findUnique({
+      where:{
+        user_id:authUser.id
+      }
+    })
+    if(!reader) throw new AppError(httpStatus.BAD_REQUEST,"Something went wrong")
+
+    if(blog.is_premium){
+      const currentSubscription = await prisma.subscription.findFirst({
+        where:{
+        reader:{
+        user_id:authUser.id
+        },
+        start_at:{
+          gt:new Date()
+        },
+        end_at:{
+          lt:new Date()
+        },
+        status:'Active'
+        }
+       })
+    
+       if(!currentSubscription){
+         throw new AppError(httpStatus.NOT_ACCEPTABLE,"This is premium content.It only for premium members")
+       }
+    }
+
+    // Upsert blog history 
+    await prisma.blogReadHistory.upsert({
+    where:{
+      reader_id_blog_id:{
+        reader_id:reader.id,
+        blog_id:blog.id
+      }
+    },
+    create:{
+     reader_id:reader.id,
+     blog_id:blog.id
+    },
+    update:{
+      count:{
+        increment:1
+      }
+    }
+    })
+ }
+
+  
+  // Increment  blog view (+1)
   await prisma.blog.update({
     where: {
-      id,
+      id:blog.id,
     },
     data: {
       views_count: {
@@ -471,7 +544,7 @@ const getTrendingBlogsFromDB = async (categoryId: string | number) => {
 const BlogService = {
   createBlogIntoDB,
   getBlogsFromDB,
-  getBlogForReadByIdFromDB,
+  getBlogForReadBySlugFromDB,
   deleteBlogByIdFromDB,
   updateBlogByIdFromDB,
   getAuthorAllBlogsFromDB,
