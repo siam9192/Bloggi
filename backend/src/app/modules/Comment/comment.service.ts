@@ -85,7 +85,7 @@ const getBlogCommentsFromDB = async (
 ) => {
   // Typecast blogId string => number
   blogId = Number(blogId);
-  const { limit, skip, page, sortBy, orderBy } =
+  const { limit, skip, page, sortBy, sortOrder } =
     calculatePagination(paginationOptions);
 
   const whereConditions: Prisma.CommentWhereInput = {
@@ -98,7 +98,7 @@ const getBlogCommentsFromDB = async (
     take: limit,
     skip,
     orderBy: {
-      [sortBy]: orderBy,
+      [sortBy]: sortOrder,
     },
     include: {
       _count: {

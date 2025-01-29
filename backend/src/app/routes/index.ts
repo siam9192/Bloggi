@@ -3,16 +3,16 @@ import AuthRouter from "../modules/Auth/auth.route";
 import UserRouter from "../modules/User/user.route";
 import ProfileRouter from "../modules/Profile/profile.route";
 import BlogRouter from "../modules/Blog/blog.route";
-import ParentCategoryRouter from "../modules/ParentCategory/parent-category.route";
 import CategoryRouter from "../modules/Category/category.route";
 import FollowerRouter from "../modules/Follower/follower.route";
 import BookmarkRouter from "../modules/Bookmark/bookmark.route";
 import CommentRouter from "../modules/Comment/comment.route";
 import CommentReactionRouter from "../modules/CommentReaction/comment-reaction.route";
-import PackageRouter from "../modules/Package/package.route";
 import SubscriptionRouter from "../modules/Subscription/subscription.route";
 import PaymentRouter from "../modules/Payment/payment.route";
 import BlogReactionRouter from "../modules/BlogReaction/blog-reaction.route";
+import StaffRouter from "../modules/Staff/staff.route";
+import OverviewRouter from "../modules/Overview/overview.route";
 
 const router = Router();
 
@@ -35,10 +35,7 @@ const moduleRoutes: TModuleRoutes = [
     path: "/blogs",
     router: BlogRouter,
   },
-  {
-    path: "/parent-categories",
-    router: ParentCategoryRouter,
-  },
+
   {
     path: "/categories",
     router: CategoryRouter,
@@ -64,10 +61,6 @@ const moduleRoutes: TModuleRoutes = [
     router: BlogReactionRouter,
   },
   {
-    path: "/packages",
-    router: PackageRouter,
-  },
-  {
     path: "/subscriptions",
     router: SubscriptionRouter,
   },
@@ -75,6 +68,18 @@ const moduleRoutes: TModuleRoutes = [
     path: "/payments",
     router: PaymentRouter,
   },
+  {
+    path: "/staffs",
+    router: StaffRouter,
+  },
+  {
+    path: "/profile",
+    router: ProfileRouter,
+  },
+  {
+    path:"/overview",
+    router:OverviewRouter
+  }
 ];
 
 const routes = moduleRoutes.map((route) =>

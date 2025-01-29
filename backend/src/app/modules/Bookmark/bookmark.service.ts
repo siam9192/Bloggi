@@ -7,7 +7,7 @@ import prisma from "../../shared/prisma";
 import { IAuthUser } from "../Auth/auth.interface";
 
 const createBookmarkIntoDB = async (
-  user: IAuthUser,
+  authUser: IAuthUser,
   data: ICreateBookmarkData,
 ) => {
   const blog = await prisma.blog.findUnique({
@@ -20,9 +20,19 @@ const createBookmarkIntoDB = async (
   if (!blog) {
     throw new AppError(httpStatus.NOT_FOUND, "Blog not found");
   }
+
+  const isAdded = await prisma.bookmark.count({
+    where: {
+      user_id: authUser.id,
+      blog_id: blog.id,
+    },
+  });
+  if (isAdded) {
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, "Already added");
+  }
   return await prisma.bookmark.create({
     data: {
-      user_id: user.id,
+      user_id: authUser.id,
       blog_id: data.blog_id,
     },
   });

@@ -4,7 +4,7 @@ import { sendSuccessResponse } from "../../shared/response";
 import httpStatus from "../../shared/http-status";
 import UserServices from "./user.service";
 import Pick from "../../utils/pick";
-import { paginationOptionKeys } from "../../utils/constanat";
+import { paginationOptionKeys } from "../../utils/constant";
 
 const createStaff = catchAsync(async (req: Request, res: Response) => {
   const result = await UserServices.createStaffIntoDB(req.body);
@@ -33,16 +33,18 @@ const changeUserStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+const getUsers = catchAsync(async (req: Request, res: Response) => {
   const filters = Pick(req.query, [
     "searchTerm",
     "name",
     "email",
     "status",
     "role",
+    "startDate",
+    "endDate",
   ]);
   const options = Pick(req.query, paginationOptionKeys);
-  const result = await UserServices.getAllUsersFromDB(filters, options as any);
+  const result = await UserServices.getUsersFromDB(filters, options as any);
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Users retrieved successfully",
@@ -64,7 +66,7 @@ const UserControllers = {
   createStaff,
   createAuthor,
   changeUserStatus,
-  getAllUsers,
+  getUsers,
   softDeleteUser,
 };
 

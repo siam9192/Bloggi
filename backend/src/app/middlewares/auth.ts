@@ -11,7 +11,6 @@ import prisma from "../shared/prisma";
 function auth(...requiredRoles: UserRole[]) {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.replace("Bearer ", "");
-
     // checking if the token is missing
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized!");
@@ -22,7 +21,7 @@ function auth(...requiredRoles: UserRole[]) {
     try {
       decoded = jwtHelpers.verifyToken(
         token,
-        config.jwt_access_secret as string,
+        config.jwt.access_secret as string,
       ) as JwtPayload;
     } catch (error) {
       throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized");
@@ -60,7 +59,6 @@ function auth(...requiredRoles: UserRole[]) {
     // ) {
     //   throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized !');
     // }
-
     if (requiredRoles && !requiredRoles.includes(role)) {
       throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized  !");
     }

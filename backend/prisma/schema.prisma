@@ -20,6 +20,7 @@ model User {
   author Author?
   reader Reader?
   staff Staff?
+  passwordChangedAt DateTime?
   join_date DateTime @default(now())
   updated_at DateTime @updatedAt
   payments Payment[]
@@ -110,6 +111,8 @@ model Blog{
   views_count Int @default(0) 
   likes_count Int @default(0)
   dislikes_count Int @default(0)
+  created_at DateTime @default(now())          
+  updated_at DateTime @default(now())
   reactions BlogReaction[]
   comments Comment[]
   bookmarks Bookmark[]
@@ -125,13 +128,17 @@ model BlogTag {
   @@map("blog_tags")
 }
 
-// model ParentCategory {
-//   id Int @id  @default(autoincrement())
-//   name String
-//   image_url String
-//   child_categories Category[] 
-//   @@map("parent_categories")
-// }
+model SearchQuery {
+  query String @unique
+  count Int
+}
+
+
+model SearchHistory {
+  user_id Int
+  keyword String 
+  @@id([user_id,keyword])
+}
 
 
 model Category {
@@ -141,8 +148,9 @@ model Category {
    image_url String?
    description String? @db.VarChar(1000)
    parent_id Int?
-   parent Category? @relation("child_categories",fields: [parent_id],references: [id],onDelete:Cascade ) 
-   children Category[] @relation("child_categories")
+   is_featured Boolean @default(false)
+   parent Category? @relation("children",fields: [parent_id],references: [id],onDelete:Cascade ) 
+   children Category[] @relation("children")
    blogs Blog[]
    @@map("categories")
 }
@@ -209,35 +217,35 @@ model CommentReaction {
 
 
 
-model Package {
+model Plan {
    id Int @id  @default(autoincrement())
    name String 
    price Int
    discount Int
-   discount_type PackageDiscountType
-   features PackageFeature[]
+   discount_type PlanDiscountType
+   features PlanFeature[]
    validity_days Int
    created_at DateTime @default(now())
    updated_at DateTime @updatedAt
    subscriptions Subscription[]
-   @@map("packages")
+   @@map("plans")
 }
 
 
 
-model PackageFeature {
+model PlanFeature {
   id Int @id  @default(autoincrement())
-  package_id Int
+  plane_id Int
   name String
-  status PackageFeatureStatus
-  package Package @relation(fields: [package_id],references: [id])
-  @@map("package_features")
+  status PlanFeatureStatus
+  plan Plan @relation(fields: [plane_id],references: [id])
+  @@map("plan_features")
 }
 
 
 model Payment {
    id Int @id  @default(autoincrement())
-   transaction_id String
+   transaction_id String @unique
    user_id Int
    amount Int
    method PaymentMethod
@@ -254,13 +262,14 @@ model Subscription {
     id Int @id  @default(autoincrement())
     reader_id Int
     payment_id Int @unique
-    package_id Int
+    plan_id Int
     status SubscriptionStatus @default(Active)
     start_at DateTime
     end_at DateTime
+    validity_days Int
     reader Reader @relation(fields: [reader_id],references: [id])
     payment Payment @relation(fields: [payment_id],references: [id])
-    package Package @relation(fields: [package_id],references: [id])
+    plan Plan @relation(fields: [plan_id],references: [id])
     created_at DateTime @default(now())
     @@map("subscriptions")
 }
@@ -277,6 +286,17 @@ model BlogReadHistory {
   @@map("blog_read_histories")
 }
 
+
+
+
+model PasswordResetRequest {
+  id String @id @default(cuid())
+  userId Int
+  isUsed Boolean @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  @@map("password_reset_requests")
+}
 
 
 
@@ -325,12 +345,12 @@ enum ReactionType {
   Dislike
 }
 
-enum PackageDiscountType {
+enum PlanDiscountType {
   Percentage
   Fixed
 }
 
-enum PackageFeatureStatus {
+enum PlanFeatureStatus {
   Included
   Not_Included
 }
@@ -344,7 +364,7 @@ enum SubscriptionStatus {
 enum PaymentMethod {
   Stripe
   Paypal
-  SSL
+  SSLCommerz
   Bkash
   Nagad
 }

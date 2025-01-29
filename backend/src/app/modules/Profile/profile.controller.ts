@@ -13,18 +13,14 @@ const getUserProfileById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getCurrentUserProfile = catchAsync(
-  async (req: Request, res: Response) => {
-    const result = await ProfileServices.getUserProfileByIdFromDB(
-      req.params.id,
-    );
-    sendSuccessResponse(res, {
-      statusCode: httpStatus.OK,
-      message: "User profile retrieved successfully",
-      data: result,
-    });
-  },
-);
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const result = await ProfileServices.getUserProfileByIdFromDB(req.user.id);
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.OK,
+    message: "User profile retrieved successfully",
+    data: result,
+  });
+});
 
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   const result = await ProfileServices.updateMyProfileIntoDB(req);
@@ -37,7 +33,7 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
 
 const ProfileControllers = {
   getUserProfileById,
-  getCurrentUserProfile,
+  getMyProfile,
   updateMyProfile,
 };
 

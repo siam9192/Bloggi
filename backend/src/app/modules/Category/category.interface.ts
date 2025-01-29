@@ -1,6 +1,13 @@
-export interface ICreateCategoryData {
-  parent_id: number;
+export interface ICreateCategoryPayload {
+  parent_id?: number;
   name: string;
+  is_featured: boolean;
+  image_url?: string;
+  children: {
+    name: string;
+    image_url?: string;
+    isFeatured: boolean;
+  }[];
 }
 
 export interface ICategoryFilterRequest {
@@ -8,9 +15,9 @@ export interface ICategoryFilterRequest {
   parentId?: string | number;
 }
 
-
-export interface ICreateCategoryPayload {
-  name:string
-  image_url?:string,
-  description?:string
+export interface IUpdateCategoryPayload {
+  id: number;
+  name: string;
+  is_featured: boolean;
+  image_url: string;
 }

@@ -15,4 +15,16 @@ export interface ILoginData {
 export interface IAuthUser {
   id: number;
   role: `${UserRole}`;
+  readerId?: number;
+  staffId?: number;
+}
+
+export interface IChangePasswordPayload {
+  oldPassword: string;
+  newPassword: string;
+}
+
+export interface IResetPasswordPayload {
+  token: string;
+  newPassword: string;
 }

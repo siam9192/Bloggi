@@ -5,7 +5,7 @@ interface IOptionsResult {
   limit: number;
   skip: number;
   sortBy: string;
-  orderBy: string;
+  sortOrder: string;
 }
 export const calculatePagination = (
   options: IPaginationOptions,
@@ -13,7 +13,7 @@ export const calculatePagination = (
   const page = Number(options.page) || 1;
   const limit = Number(options.limit) || 12;
   const sortBy = options.sortBy || "created_at";
-  const orderBy = options.orderBy || "desc";
+  const sortOrder = options.sortOrder || "desc";
   const skip = (page - 1) * limit;
 
   return {
@@ -21,6 +21,6 @@ export const calculatePagination = (
     limit,
     skip,
     sortBy,
-    orderBy,
+    sortOrder,
   };
 };

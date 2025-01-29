@@ -4,7 +4,7 @@ import { sendSuccessResponse } from "../../shared/response";
 import httpStatus from "../../shared/http-status";
 import CommentServices from "./comment.service";
 import Pick from "../../utils/pick";
-import { paginationOptionKeys } from "../../utils/constanat";
+import { paginationOptionKeys } from "../../utils/constant";
 
 const createComment = catchAsync(async (req: Request, res: Response) => {
   const result = await CommentServices.createCommentIntoDB(req.user, req.body);

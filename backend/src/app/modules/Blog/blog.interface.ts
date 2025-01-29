@@ -10,7 +10,7 @@ export interface ICreateBlogPayload {
   tags: string[];
   publish_date: Date;
   privacy_status: `${BlogPrivacyStatus}`;
-  status: `${BlogStatus}`
+  status: `${BlogStatus}`;
 }
 
 export interface IUpdateBlogData {
@@ -30,6 +30,9 @@ export interface IUpdateBlogData {
 export interface IBlogFilterOptions {
   searchTerm?: string;
   categories?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: `${BlogStatus}`;
 }
 
 export interface IAuthorBlogsFilter {

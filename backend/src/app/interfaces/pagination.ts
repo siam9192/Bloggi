@@ -2,8 +2,8 @@ export interface IPaginationOptions {
   page: string | number;
   limit: number;
   sortBy: string | undefined;
-  orderBy: string;
+  sortOrder: string;
 }
 
-enum OrderBy {}
+enum sortOrder {}
 // ASC = ''

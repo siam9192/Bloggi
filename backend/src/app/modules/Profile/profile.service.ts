@@ -7,9 +7,8 @@ import {
   IUpdateStaffProfileData,
 } from "./profile.interface";
 import ProfileValidations from "./profile.validation";
-import { profile } from "console";
 
-const getUserProfileByIdFromDB = async (id: string) => {
+const getUserProfileByIdFromDB = async (id: string | number) => {
   // Get user if user not exist then throw user not found error
   const user = await prisma.user.findUniqueOrThrow({
     where: {

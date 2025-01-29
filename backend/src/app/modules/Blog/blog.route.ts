@@ -15,11 +15,20 @@ router.post(
   BlogControllers.createBlog,
 );
 
-router.get("/",BlogControllers.getBlogs);
+router.get("/", BlogControllers.getBlogs);
 router.get("/recent", BlogControllers.getRecentBlogs);
 router.get("/trending/:categoryId", BlogControllers.getTrendingBlogs);
-router.get("/author", auth(UserRole.Author), BlogControllers.getAuthorAllBlogs);
-router.get("/:slug",authProvider(...Object.values(UserRole)),BlogControllers.getBlogForReadById);
+router.get("/my", auth(UserRole.Author), BlogControllers.getBlogs);
+router.get(
+  "/manage",
+  auth(UserRole.SuperAdmin, UserRole.Admin, UserRole.Moderator),
+  BlogControllers.getBlogsForManage,
+);
+router.get(
+  "/:slug",
+  authProvider(...Object.values(UserRole)),
+  BlogControllers.getBlogForReadBySlug,
+);
 router.delete("/:id", BlogControllers.deleteBlogById);
 
 const BlogRouter = router;

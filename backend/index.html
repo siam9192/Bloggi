@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Two-Sided Range Slider</title>
+<style>
+    .slider-container {
+  position: relative;
+  width: 300px;
+  height: 10px;
+  background-color: #ddd;
+  border-radius: 5px;
+  margin: 20px 0;
+}
+
+.slider-track {
+  position: absolute;
+  height: 100%;
+  background-color: #4CAF50;
+  border-radius: 5px;
+}
+
+.slider-thumb {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: #4CAF50;
+  border-radius: 50%;
+  cursor: pointer;
+  top: -5px;
+  transform: translateX(-50%);
+}
+
+.left-thumb {
+  left: 0;
+}
+
+.right-thumb {
+  right: 0;
+}
+
+.values {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+</style>
+</head>
+<body>
+    <div class="slider-container">
+        <div class="slider-track"></div>
+        <div class="slider-thumb left-thumb"></div>
+        <div class="slider-thumb right-thumb"></div>
+      </div>
+      <div class="values">
+        <span id="min-value">0</span>
+        <span id="max-value">100</span>
+      </div>
+
+ <script>
+    document.addEventListener("DOMContentLoaded", function () {
+  const sliderContainer = document.querySelector(".slider-container");
+  const sliderTrack = document.querySelector(".slider-track");
+  const leftThumb = document.querySelector(".left-thumb");
+  const rightThumb = document.querySelector(".right-thumb");
+  const minValue = document.getElementById("min-value");
+  const maxValue = document.getElementById("max-value");
+
+  const min = 0;
+  const max = 100;
+  let leftValue = min;
+  let rightValue = max;
+  let isMouseUp = true;
+  let isMouseDown =  false;
+
+  function updateSlider() {
+    const sliderWidth = sliderContainer.offsetWidth;
+    const leftPercent = ((leftValue - min) / (max - min)) * 100;
+    const rightPercent = ((rightValue - min) / (max - min)) * 100;
+
+    leftThumb.style.left = `${leftPercent}%`;
+    rightThumb.style.left = `${rightPercent}%`;
+    sliderTrack.style.left = `${leftPercent}%`;
+    sliderTrack.style.width = `${rightPercent - leftPercent}%`;
+
+    minValue.textContent = leftValue;
+    maxValue.textContent = rightValue;
+  }
+
+  function moveThumb(thumb, isLeftThumb) {
+    return function (event) {
+      const sliderRect = sliderContainer.getBoundingClientRect();
+      let newX = event.clientX - sliderRect.left;
+      newX = Math.max(0, Math.min(newX, sliderRect.width));
+
+      const newValue = Math.round((newX / sliderRect.width) * (max - min) + min);
+
+      if (isLeftThumb) {
+        if (newValue < rightValue) {
+          leftValue = newValue;
+        }
+      } else {
+        if (newValue > leftValue) {
+          rightValue = newValue;
+        }
+      }
+
+    //  if(isMouseDown && !isMouseUp) {
+    //   updateSlider();
+    //  }
+    updateSlider()
+    };
+  }
+
+  leftThumb.addEventListener("mousedown", function () {
+    isMouseDown = true
+    isMouseUp = false
+    document.addEventListener("mousemove", moveThumb(leftThumb, true));
+  });
+
+  rightThumb.addEventListener("mousedown", function () {
+    isMouseDown = true
+    isMouseUp = false
+    document.addEventListener("mousemove", moveThumb(rightThumb, false));
+  });
+
+  document.addEventListener("mouseup", function () {
+    isMouseDown = false
+    isMouseUp = true
+    document.removeEventListener("mousemove", moveThumb(leftThumb, true));
+    document.removeEventListener("mousemove", moveThumb(rightThumb, false));
+  });
+
+  updateSlider();
+});
+ </script>
+</body>
+</html>

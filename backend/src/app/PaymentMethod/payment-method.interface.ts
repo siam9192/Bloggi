@@ -5,4 +5,5 @@ export interface IPaymentMethodData {
   transaction_id: string;
   success_url: string;
   cancel_url: string;
+  fail_url: string;
 }

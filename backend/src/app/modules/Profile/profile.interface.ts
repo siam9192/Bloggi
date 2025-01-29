@@ -1,10 +1,4 @@
-import {
-  Author,
-  Reader,
-  SocialLink,
-  SocialPlatform,
-  Staff,
-} from "@prisma/client";
+import { Author, Reader, SocialPlatform, Staff } from "@prisma/client";
 
 interface ISocialLinkUpdate {
   author_id: number;

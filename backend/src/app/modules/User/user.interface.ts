@@ -29,4 +29,6 @@ export interface IUserFilterRequest {
   email?: string;
   status?: string;
   role?: string;
+  startDate?: string;
+  endDate?: string;
 }

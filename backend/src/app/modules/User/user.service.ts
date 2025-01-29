@@ -10,6 +10,7 @@ import {
 } from "./user.interface";
 import { IPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../helpers/paginationHelper";
+import { validateDate } from "../../utils/function";
 
 const createStaffIntoDB = async (data: ICreateStaffData) => {
   const user = await prisma.user.findFirst({
@@ -142,11 +143,11 @@ const ChangeUserStatusIntoDB = async (data: {
   });
 };
 
-const getAllUsersFromDB = async (
+const getUsersFromDB = async (
   query: IUserFilterRequest,
   options: IPaginationOptions,
 ) => {
-  const { searchTerm, ...filterData } = query;
+  const { searchTerm, startDate, endDate, ...filterData } = query;
 
   const { limit, skip, page } = calculatePagination(options);
 
@@ -162,6 +163,34 @@ const getAllUsersFromDB = async (
     });
   }
 
+  if (startDate || endDate) {
+    if (
+      startDate &&
+      validateDate(startDate) &&
+      endDate &&
+      validateDate(endDate)
+    ) {
+      andConditions.push({
+        join_date: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+      });
+    } else if (startDate && validateDate(startDate)) {
+      andConditions.push({
+        join_date: {
+          gte: new Date(startDate),
+        },
+      });
+    } else if (endDate && validateDate(endDate)) {
+      andConditions.push({
+        join_date: {
+          lte: new Date(endDate),
+        },
+      });
+    }
+  }
+
   const whereConditions: Prisma.UserWhereInput = {
     AND: andConditions,
   };
@@ -171,9 +200,9 @@ const getAllUsersFromDB = async (
     skip,
     take: limit,
     orderBy:
-      options.sortBy && options.orderBy
+      options.sortBy && options.sortOrder
         ? {
-            [options.sortBy]: options.orderBy,
+            [options.sortBy]: options.sortOrder,
           }
         : {
             join_date: "desc",
@@ -218,6 +247,9 @@ const getAllUsersFromDB = async (
   };
 };
 
+
+
+
 const softDeleteUserIntoDB = async (userId: string) => {
   // Check user existence
   await prisma.user.findUniqueOrThrow({
@@ -247,7 +279,7 @@ const UserServices = {
   createStaffIntoDB,
   createAuthorIntoDB,
   ChangeUserStatusIntoDB,
-  getAllUsersFromDB,
+  getUsersFromDB,
   softDeleteUserIntoDB,
 };
 

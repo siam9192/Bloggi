@@ -4,7 +4,7 @@ import httpStatus from "../../shared/http-status";
 import { sendSuccessResponse } from "../../shared/response";
 import FollowerServices from "./follower.service";
 import Pick from "../../utils/pick";
-import { paginationOptionKeys } from "../../utils/constanat";
+import { paginationOptionKeys } from "../../utils/constant";
 
 const createFollower = catchAsync(async (req: Request, res: Response) => {
   const result = await FollowerServices.createFollowerInto(req.user, req.body);

@@ -2,14 +2,15 @@ import { Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync";
 import { sendSuccessResponse } from "../../shared/response";
 import httpStatus from "../../shared/http-status";
-import BlogService from "./blog.service";
+import BlogServices from "./blog.service";
 import Pick from "../../utils/pick";
-import { paginationOptionKeys } from "../../utils/constanat";
+import { paginationOptionKeys } from "../../utils/constant";
+import { IPaginationOptions } from "../../interfaces/pagination";
+import { getPaginationOptions } from "../../utils/function";
 
 const createBlog = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user.id;
-  const result = await BlogService.createBlogIntoDB(userId, req.body);
-
+  const result = await BlogServices.createBlogIntoDB(userId, req.body);
   sendSuccessResponse(res, {
     statusCode: httpStatus.CREATED,
     message: "Blog created successful",
@@ -20,8 +21,7 @@ const createBlog = catchAsync(async (req: Request, res: Response) => {
 const getBlogs = catchAsync(async (req: Request, res: Response) => {
   const query = Pick(req.query, ["searchTerm", "categories"]);
   const options = Pick(req.query, paginationOptionKeys);
-  const result = await BlogService.getBlogsFromDB(query, options as any);
-
+  const result = await BlogServices.getBlogsFromDB(query, options as any);
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blogs retrieved successfully",
@@ -30,10 +30,10 @@ const getBlogs = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getAuthorAllBlogs = catchAsync(async (req: Request, res: Response) => {
+const getMyBlogs = catchAsync(async (req: Request, res: Response) => {
   const query = Pick(req.query, ["searchTerm", "categories", "status"]);
   const options = Pick(req.query, paginationOptionKeys);
-  const result = await BlogService.getAuthorAllBlogsFromDB(
+  const result = await BlogServices.getMyBlogsFromDB(
     req.user,
     query,
     options as any,
@@ -45,8 +45,11 @@ const getAuthorAllBlogs = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getBlogForReadById = catchAsync(async (req: Request, res: Response) => {
-  const result = await BlogService.getBlogForReadBySlugFromDB(req.user,req.params.slug);
+const getBlogForReadBySlug = catchAsync(async (req: Request, res: Response) => {
+  const result = await BlogServices.getBlogForReadBySlugFromDB(
+    req.user,
+    req.params.slug,
+  );
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blog retrieved successfully",
@@ -54,8 +57,25 @@ const getBlogForReadById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getBlogsForManage = catchAsync(async (req: Request, res: Response) => {
+  const filter = Pick(req.query, [
+    "searchTerm",
+    "categories",
+    "status",
+    "startDate",
+    "endDate",
+  ]);
+  const options = getPaginationOptions(req.query);
+  const result = await BlogServices.getBlogsForManageFromDB(filter, options);
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.OK,
+    message: "Blogs retrieved successfully",
+    ...result,
+  });
+});
+
 const getRecentBlogs = catchAsync(async (req: Request, res: Response) => {
-  const result = await BlogService.getRecentBlogsFromDB();
+  const result = await BlogServices.getRecentBlogsFromDB();
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blogs retrieved successfully",
@@ -64,7 +84,7 @@ const getRecentBlogs = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getTrendingBlogs = catchAsync(async (req: Request, res: Response) => {
-  const result = await BlogService.getTrendingBlogsFromDB(
+  const result = await BlogServices.getTrendingBlogsFromDB(
     req.params.categoryId,
   );
   sendSuccessResponse(res, {
@@ -75,7 +95,7 @@ const getTrendingBlogs = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteBlogById = catchAsync(async (req: Request, res: Response) => {
-  const result = await BlogService.deleteBlogByIdFromDB(req.params.id);
+  const result = await BlogServices.deleteBlogByIdFromDB(req.params.id);
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blog deleted successfully",
@@ -84,7 +104,7 @@ const deleteBlogById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateBlogById = catchAsync(async (req: Request, res: Response) => {
-  const result = await BlogService.deleteBlogByIdFromDB(req.params.id);
+  const result = await BlogServices.deleteBlogByIdFromDB(req.params.id);
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blog deleted successfully",
@@ -97,8 +117,9 @@ const BlogControllers = {
   getBlogs,
   getRecentBlogs,
   getTrendingBlogs,
-  getAuthorAllBlogs,
-  getBlogForReadById,
+  getMyBlogs,
+  getBlogsForManage,
+  getBlogForReadBySlug,
   deleteBlogById,
   updateBlogById,
 };

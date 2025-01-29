@@ -6,6 +6,7 @@ import httpStatus from "../../shared/http-status";
 import { IFollowersFilterRequest } from "./follower.interface";
 import { IPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../helpers/paginationHelper";
+import { validateDate } from "../../utils/function";
 
 const createFollowerInto = async (user: IAuthUser, data: Follower) => {
   const reader = await prisma.reader.findUnique({
@@ -116,10 +117,37 @@ const getAuthorFollowersFromDB = async (
 
 const getMyFollowersFromDB = async (
   authUser: IAuthUser,
-  filterData: IFollowersFilterRequest,
+  filter: IFollowersFilterRequest,
   options: IPaginationOptions,
 ) => {
   const { limit, skip, page } = calculatePagination(options);
+
+  const { name, followerSince } = filter;
+
+  const andConditions: Prisma.FollowerWhereInput[] = [];
+
+  if (name) {
+    const [firstName, lastName] = name.split(" ");
+
+    const filObj: { first_name?: string; last_name?: string } = {};
+    if (firstName) {
+      filObj.first_name = firstName;
+    }
+    if (lastName) {
+      filObj.last_name = lastName;
+    }
+    andConditions.push({
+      reader: filObj,
+    });
+  }
+
+  if (followerSince && validateDate(followerSince)) {
+    andConditions.push({
+      created_at: {
+        gte: new Date(followerSince),
+      },
+    });
+  }
 
   const whereConditions: Prisma.FollowerWhereInput = {
     author: {
