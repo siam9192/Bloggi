@@ -114,6 +114,7 @@ const initPlanSubscription = async (
         start_at,
         end_at,
         validity_days: plan.validity_days,
+        planData:plan
       },
     });
 
@@ -205,10 +206,10 @@ const getSubscriptionsFromDB = async (
   const data = await prisma.subscription.findMany({
     where: whereConditions,
     skip,
-    take:limit,
-    orderBy:{
-      [sortBy]:sortOrder
-    }
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
   });
 
   const total = await prisma.subscription.count({

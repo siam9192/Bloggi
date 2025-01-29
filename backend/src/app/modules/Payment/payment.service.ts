@@ -79,16 +79,20 @@ const validateSSLSubscriptionPayment = async (payload: any) => {
       },
     });
 
-    if (!payment)
-      throw new AppError(httpStatus.BAD_REQUEST, "Invalid payment!");
-    await prisma.payment.update({
-      where: {
-        id: payment.id,
-      },
-      data: {
-        status: PaymentStatus.Success,
-      },
-    });
+    if (!payment) throw new AppError(httpStatus.BAD_REQUEST, "Invalid payment!");
+    if(payment.status !== PaymentStatus.Timeout){
+      await prisma.payment.update({
+        where: {
+          id: payment.id,
+        },
+        data: {
+          status: PaymentStatus.Success,
+        },
+      });
+    }
+    else {
+      
+    }
   } else {
     PaymentServices.manageCanceledOrFailedPayment(
       payload.tran_id,
@@ -113,14 +117,21 @@ const validateStripeSubscriptionPayment = async (event: any) => {
       if (!payment) {
         throw new AppError(httpStatus.BAD_REQUEST, "Invalid payment");
       }
-      await prisma.payment.update({
-        where: {
-          id: payment.id,
-        },
-        data: {
-          status: PaymentStatus.Success,
-        },
-      });
+      if(payment.status !== PaymentStatus.Timeout){
+        await prisma.payment.update({
+          where: {
+            id: payment.id,
+          },
+          data: {
+            status: PaymentStatus.Success,
+          },
+        });
+      }
+      else {
+        
+      }
+
+
 
     case "checkout.session.async_payment_failed":
       await PaymentServices.manageCanceledOrFailedPayment(

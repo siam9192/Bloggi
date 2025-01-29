@@ -13,6 +13,7 @@ import PaymentRouter from "../modules/Payment/payment.route";
 import BlogReactionRouter from "../modules/BlogReaction/blog-reaction.route";
 import StaffRouter from "../modules/Staff/staff.route";
 import OverviewRouter from "../modules/Overview/overview.route";
+import PlanRouter from "../modules/Plan/plan.route";
 
 const router = Router();
 
@@ -61,6 +62,10 @@ const moduleRoutes: TModuleRoutes = [
     router: BlogReactionRouter,
   },
   {
+    path:"/plans",
+    router:PlanRouter
+  },
+  {
     path: "/subscriptions",
     router: SubscriptionRouter,
   },
@@ -77,9 +82,9 @@ const moduleRoutes: TModuleRoutes = [
     router: ProfileRouter,
   },
   {
-    path:"/overview",
-    router:OverviewRouter
-  }
+    path: "/overview",
+    router: OverviewRouter,
+  },
 ];
 
 const routes = moduleRoutes.map((route) =>

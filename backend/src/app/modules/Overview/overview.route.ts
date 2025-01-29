@@ -3,10 +3,8 @@ import OverviewControllers from "./overview.controller";
 
 const router = Router();
 
-router.get("/",OverviewControllers.getAllOverviewData);
+router.get("/", OverviewControllers.getAllOverviewData);
 
+const OverviewRouter = router;
 
-const OverviewRouter = router
-
-
-export default OverviewRouter
+export default OverviewRouter;

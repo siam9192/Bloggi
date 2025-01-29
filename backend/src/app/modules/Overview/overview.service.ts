@@ -98,6 +98,18 @@ const getAllOverviewDataFromDB = async () => {
     };
   });
 
+  const currentDate = new Date();
+  currentDate.setMonth(-12);
+
+  const postingBlogsAnalyze = await prisma.$queryRaw`SELECT 
+  EXTRACT(MONTH FROM publish_date) AS month,
+  EXTRACT(YEAR FROM publish_date) AS year,
+  COUNT(*) AS count
+FROM blogs
+GROUP BY EXTRACT(MONTH FROM publish_date), EXTRACT(YEAR FROM publish_date)
+ORDER BY year, month;
+`;
+ 
   return {
     totalUsers,
     totalReaders,
@@ -106,6 +118,7 @@ const getAllOverviewDataFromDB = async () => {
     totalBlogs,
     recentBlogs,
     recentUsers: recentUsersData,
+    postingBlogsAnalyze,
   };
 };
 

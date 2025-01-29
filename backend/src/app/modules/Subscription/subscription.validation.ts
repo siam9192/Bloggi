@@ -1,13 +1,14 @@
 import { PaymentMethod } from "@prisma/client";
 import { z } from "zod";
 
-const PurchasePackageValidation = z.object({
-  package_id: z.number(),
+const PurchasePlanValidation = z.object({
+  plan_id: z.number(),
   method: z.enum(Object.values(PaymentMethod) as [string, ...string[]]),
 });
 
+
 const SubscriptionValidations = {
-  PurchasePackageValidation,
+  PurchasePlanValidation,
 };
 
 export default SubscriptionValidations;

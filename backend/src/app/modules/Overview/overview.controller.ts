@@ -13,11 +13,8 @@ const getAllOverviewData = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
-
 const OverviewControllers = {
-    getAllOverviewData
-}
+  getAllOverviewData,
+};
 
-export default OverviewControllers
-
+export default OverviewControllers;

@@ -19,7 +19,7 @@ const createBlog = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getBlogs = catchAsync(async (req: Request, res: Response) => {
-  const query = Pick(req.query, ["searchTerm", "categories"]);
+  const query = Pick(req.query, ["searchTerm", "categories", "type"]);
   const options = Pick(req.query, paginationOptionKeys);
   const result = await BlogServices.getBlogsFromDB(query, options as any);
   sendSuccessResponse(res, {
@@ -31,7 +31,15 @@ const getBlogs = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMyBlogs = catchAsync(async (req: Request, res: Response) => {
-  const query = Pick(req.query, ["searchTerm", "categories", "status"]);
+  const query = Pick(req.query, [
+    "searchTerm",
+    "categories",
+    "status",
+    "startDate",
+    "endDate",
+    "type",
+  ]);
+
   const options = Pick(req.query, paginationOptionKeys);
   const result = await BlogServices.getMyBlogsFromDB(
     req.user,

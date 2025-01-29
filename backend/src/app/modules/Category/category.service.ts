@@ -61,38 +61,40 @@ const createCategoryIntoDB = async (payload: ICreateCategoryPayload) => {
     });
 
     const children = payload.children;
-    // Create child categories of this category
-    for (let i = 0; i < children.length; i++) {
-      const item = children[i];
-      let slug = generateSlug(item.name);
+    if (children && children.length) {
+      // Create child categories of this category
+      for (let i = 0; i < children.length; i++) {
+        const item = children[i];
+        let slug = generateSlug(item.name);
 
-      // Generate unique slug
-      let counter = 1;
-      do {
-        const category = await prisma.category.findUnique({
-          where: {
-            slug,
-          },
-          select: {
-            id: true,
-          },
+        // Generate unique slug
+        let counter = 1;
+        do {
+          const category = await prisma.category.findUnique({
+            where: {
+              slug,
+            },
+            select: {
+              id: true,
+            },
+          });
+          if (!category) {
+            break;
+          }
+          counter++;
+          slug = generateSlug(item.name + " " + counter);
+        } while (true);
+
+        const data = {
+          ...item,
+          parent_id: createdParentCategory.id,
+          slug,
+        };
+
+        await tx.category.create({
+          data,
         });
-        if (!category) {
-          break;
-        }
-        counter++;
-        slug = generateSlug(item.name + " " + counter);
-      } while (true);
-
-      const data = {
-        ...item,
-        parent_id: createdParentCategory.id,
-        slug,
-      };
-
-      await tx.category.create({
-        data,
-      });
+      }
     }
 
     return await tx.category.findUnique({
@@ -252,7 +254,7 @@ const getPopularCategoriesFromDB = async () => {
 const getFeaturedCategoriesFromDB = async () => {
   return await prisma.category.findMany({
     where: {
-      isFeatured: true,
+      is_featured: true,
     },
     include: {
       _count: {

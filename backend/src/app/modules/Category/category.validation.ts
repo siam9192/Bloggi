@@ -2,16 +2,18 @@ import { z } from "zod";
 
 const CreateCategoryValidationSchema = z.object({
   name: z.string().min(1).max(50),
-  parent_id: z.string().optional(),
+  parent_id: z.number().optional(),
   is_featured: z.boolean().default(false),
   image_url: z.string().url().optional(),
-  children: z.array(
-    z.object({
-      name: z.string(),
-      image_url: z.string().url().optional(),
-      is_featured: z.boolean(),
-    }),
-  ),
+  children: z
+    .array(
+      z.object({
+        name: z.string(),
+        image_url: z.string().url().optional(),
+        is_featured: z.boolean(),
+      }),
+    )
+    .optional(),
 });
 
 const UpdateCategoryValidationSchema = z.object({

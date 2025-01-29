@@ -270,6 +270,7 @@ model Subscription {
     reader Reader @relation(fields: [reader_id],references: [id])
     payment Payment @relation(fields: [payment_id],references: [id])
     plan Plan @relation(fields: [plan_id],references: [id])
+    planData Json
     created_at DateTime @default(now())
     @@map("subscriptions")
 }
@@ -375,5 +376,7 @@ enum PaymentStatus {
   Success
   Failed 
   Canceled
+  Expired
+  Timeout
 }
 

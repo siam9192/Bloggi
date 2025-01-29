@@ -1,4 +1,9 @@
-import { BlogStatus, Prisma, UserRole } from "@prisma/client";
+import {
+  BlogPrivacyStatus,
+  BlogStatus,
+  Prisma,
+  UserRole,
+} from "@prisma/client";
 import prisma from "../../shared/prisma";
 import {
   IBlogFilterOptions,
@@ -11,7 +16,7 @@ import AppError from "../../Errors/AppError";
 import httpStatus from "../../shared/http-status";
 import { IAuthUser } from "../Auth/auth.interface";
 import { blogsResultFormat } from "./blog,constant";
-import { generateSlug } from "../../utils/function";
+import { generateSlug, validateDate } from "../../utils/function";
 
 const createBlogIntoDB = async (
   userId: number,
@@ -83,10 +88,10 @@ const createBlogIntoDB = async (
 };
 
 const getBlogsFromDB = async (
-  query: IBlogFilterOptions,
+  filter: IBlogFilterOptions,
   options: IPaginationOptions,
 ) => {
-  const { searchTerm, categories } = query;
+  const { searchTerm, categories, type } = filter;
 
   const { limit, skip, page } = calculatePagination(options);
 
@@ -128,8 +133,15 @@ const getBlogsFromDB = async (
       ],
     });
   }
+
+  if (type && ["premium", "free"].includes(type)) {
+    andConditions.push({
+      is_premium: type === "free" ? false : true,
+    });
+  }
   const whereConditions: Prisma.BlogWhereInput = {
     AND: andConditions,
+    privacy_status: BlogPrivacyStatus.Public,
   };
 
   const data = await prisma.blog.findMany({
@@ -173,6 +185,8 @@ const getBlogsFromDB = async (
         full_name: author.first_name + " " + author.last_name,
         profile_photo: author.profile_photo,
       },
+      is_premium: item.is_premium,
+      publish_date: item.publish_date,
       created_at: item.created_at,
     };
   });
@@ -292,7 +306,14 @@ const getMyBlogsFromDB = async (
   filterOptions: IBlogFilterOptions,
   options: IPaginationOptions,
 ) => {
-  const { searchTerm, categories, ...otherFilterOptions } = filterOptions;
+  const {
+    searchTerm,
+    categories,
+    type,
+    startDate,
+    endDate,
+    ...otherFilterOptions
+  } = filterOptions;
 
   const { limit, skip } = calculatePagination(options);
 
@@ -348,6 +369,39 @@ const getMyBlogsFromDB = async (
     });
   });
 
+  if (type && ["premium", "free"].includes(type)) {
+    andConditions.push({
+      is_premium: type === "free" ? false : true,
+    });
+  }
+
+  if (startDate || endDate) {
+    if (
+      startDate &&
+      validateDate(startDate) &&
+      endDate &&
+      validateDate(endDate)
+    ) {
+      andConditions.push({
+        created_at: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+      });
+    } else if (startDate && validateDate(startDate)) {
+      andConditions.push({
+        created_at: {
+          gte: new Date(startDate),
+        },
+      });
+    } else if (endDate && validateDate(endDate)) {
+      andConditions.push({
+        created_at: {
+          lte: new Date(endDate),
+        },
+      });
+    }
+  }
   const whereConditions: Prisma.BlogWhereInput = {
     AND: andConditions,
   };
@@ -380,7 +434,7 @@ const getBlogsForManageFromDB = async (
   query: IBlogFilterOptions,
   options: IPaginationOptions,
 ) => {
-  const { searchTerm, categories, startDate, endDate, status } = query;
+  const { searchTerm, categories, startDate, endDate, status, type } = query;
 
   const { limit, skip, page } = calculatePagination(options);
 
@@ -425,6 +479,12 @@ const getBlogsForManageFromDB = async (
   if (status && Object.values(BlogStatus).includes(status)) {
     andConditions.push({
       status,
+    });
+  }
+
+  if (type && ["premium", "free"].includes(type)) {
+    andConditions.push({
+      is_premium: type === "free" ? false : true,
     });
   }
 

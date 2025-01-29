@@ -10,7 +10,7 @@ const router = Router();
 router.post(
   "/subscribe-plan",
   auth(UserRole.Reader),
-  validateRequest(SubscriptionValidations.PurchasePackageValidation),
+  validateRequest(SubscriptionValidations.PurchasePlanValidation),
   subscriptionControllers.purchasePackage,
 );
 

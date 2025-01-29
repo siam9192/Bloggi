@@ -16,6 +16,7 @@ export interface IAuthUser {
   id: number;
   role: `${UserRole}`;
   readerId?: number;
+  authorId?: number;
   staffId?: number;
 }
 

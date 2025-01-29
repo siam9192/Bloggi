@@ -33,6 +33,7 @@ export interface IBlogFilterOptions {
   startDate?: string;
   endDate?: string;
   status?: `${BlogStatus}`;
+  type?: "premium" | "free";
 }
 
 export interface IAuthorBlogsFilter {

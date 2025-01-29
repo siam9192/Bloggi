@@ -247,9 +247,6 @@ const getUsersFromDB = async (
   };
 };
 
-
-
-
 const softDeleteUserIntoDB = async (userId: string) => {
   // Check user existence
   await prisma.user.findUniqueOrThrow({

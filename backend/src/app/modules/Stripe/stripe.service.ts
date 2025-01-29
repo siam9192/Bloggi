@@ -6,7 +6,7 @@ async function createCheckoutSession(payload: {
   amount: number;
   transactionId: string;
 }) {
-  const response = stripe.stripe.checkout.sessions.create({
+  const response = stripe.checkout.sessions.create({
     line_items: [
       {
         price_data: {
@@ -23,7 +23,7 @@ async function createCheckoutSession(payload: {
     // The URL of your payment completion page
     success_url: config.payment.success_url,
     cancel_url: config.payment.cancel_url,
-    metaData: {
+    metadata: {
       transactionId: payload.transactionId,
     },
   });

@@ -70,6 +70,7 @@ const Login = async (data: ILoginData) => {
     },
     include: {
       reader: true,
+      author: true,
       staff: true,
     },
   });
@@ -94,6 +95,8 @@ const Login = async (data: ILoginData) => {
 
   if (user.role === UserRole.Reader) {
     tokenPayload.readerId = user.reader!.id;
+  } else if (user.role === UserRole.Author) {
+    tokenPayload.authorId = user.author!.id;
   } else {
     tokenPayload.staffId = user.staff!.id;
   }
