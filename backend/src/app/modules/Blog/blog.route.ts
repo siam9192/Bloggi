@@ -18,17 +18,39 @@ router.post(
 router.get("/", BlogControllers.getBlogs);
 router.get("/recent", BlogControllers.getRecentBlogs);
 router.get("/trending/:categoryId", BlogControllers.getTrendingBlogs);
-router.get("/my", auth(UserRole.Author), BlogControllers.getBlogs);
+router.get("/my", auth(UserRole.Author), BlogControllers.getMyBlogs);
 router.get(
   "/manage",
   auth(UserRole.SuperAdmin, UserRole.Admin, UserRole.Moderator),
   BlogControllers.getBlogsForManage,
 );
+
 router.get(
-  "/:slug",
+  "/:id/states",
+  auth(UserRole.SuperAdmin, UserRole.Admin, UserRole.Author),
+  BlogControllers.getBlogStates,
+);
+
+router.get(
+  "/:id",
+  authProvider(UserRole.SuperAdmin, UserRole.Admin, UserRole.Author),
+  BlogControllers.getBlogById,
+);
+
+router.get(
+  "/read/:slug",
   authProvider(...Object.values(UserRole)),
   BlogControllers.getBlogForReadBySlug,
 );
+router.get("/:slug/related", BlogControllers.getRelatedBlogs);
+
+router.put(
+  "/:id",
+  authProvider(UserRole.Author),
+  validateRequest(BlogValidations.UpdateBlogValidation),
+  BlogControllers.updateBlogById,
+);
+
 router.delete("/:id", BlogControllers.deleteBlogById);
 
 const BlogRouter = router;

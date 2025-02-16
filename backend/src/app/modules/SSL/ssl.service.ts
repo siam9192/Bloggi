@@ -11,7 +11,7 @@ const createPaymentSession = async (
     store_id: config.ssl.store_id,
     store_passwd: config.ssl.store_password,
     total_amount: payload.amount,
-    currency: "BDT",
+    currency: "USD",
     tran_id: payload.transactionId, // use unique tran_id for each api call
     success_url: config.ssl.success_url,
     fail_url: config.ssl.fail_url,

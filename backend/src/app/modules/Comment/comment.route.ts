@@ -21,9 +21,9 @@ router.post(
   CommentControllers.createCommentReplay,
 );
 
-router.get("/:blogId", CommentControllers.getComments);
+router.get("/:blogId", CommentControllers.getBlogComments);
 
-router.get("/:commentId", CommentControllers.getCommentReplies);
+router.get("/:commentId/replies", CommentControllers.getCommentReplies);
 
 router.patch("/", CommentControllers.updateComment);
 

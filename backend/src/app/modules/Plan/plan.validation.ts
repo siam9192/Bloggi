@@ -1,4 +1,3 @@
-
 import { PlanDiscountType, PlanFeatureStatus } from "@prisma/client";
 import { z } from "zod";
 
@@ -18,26 +17,32 @@ const CreatePlanValidation = z.object({
   features: z.array(CreateFeature),
 });
 
-const  UpdatePlanValidation  = z.object({
+const UpdatePlanValidation = z.object({
   name: z.string().optional(),
   price: z.number().optional(),
   discount: z.number().optional(),
-  discount_type: z.enum(
-    Object.values(PlanDiscountType) as [string, ...string[]],
-  ).optional(),
+  discount_type: z
+    .enum(Object.values(PlanDiscountType) as [string, ...string[]])
+    .optional(),
   validity_days: z.number().min(7).optional(),
   new_features: z.array(CreateFeature).optional(),
-  updated_features:z.array(z.object({
-    id:z.string(),
-    name:z.string().optional(),
-    status: z.enum(Object.values(PlanFeatureStatus) as [string, ...string[]]).optional()
-  })).optional(),
-  deleted_featuresId:z.array(z.string()).optional()
-})
+  updated_features: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string().optional(),
+        status: z
+          .enum(Object.values(PlanFeatureStatus) as [string, ...string[]])
+          .optional(),
+      }),
+    )
+    .optional(),
+  deleted_featuresId: z.array(z.string()).optional(),
+});
 
 const PlanValidations = {
   CreatePlanValidation,
-  UpdatePlanValidation
+  UpdatePlanValidation,
 };
 
 export default PlanValidations;

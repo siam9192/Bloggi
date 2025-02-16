@@ -8,7 +8,7 @@ import { paginationOptionKeys } from "../../utils/constant";
 
 const getStaffs = catchAsync(async (req: Request, res: Response) => {
   const paginationOptions = Pick(req.query, paginationOptionKeys);
-  const result = await StaffServices.getStaffsFromDB();
+  const result = await StaffServices.getStaffsFromDB(paginationOptions as any);
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Staffs retrieved successfully",

@@ -17,6 +17,7 @@ import { JwtPayload } from "jsonwebtoken";
 import ejs from "ejs";
 import path from "path";
 import NodeMailerServices from "../NodeMailer/node-mailer.service";
+import { boolean } from "zod";
 const SignUp = async (data: ISignUpData) => {
   const user = await prisma.user.findFirst({
     where: {
@@ -286,6 +287,34 @@ const resetPassword = async (payload: IResetPasswordPayload) => {
   return null;
 };
 
+const getMeFromDB = async (authUser: IAuthUser) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: authUser.id,
+    },
+    select: {
+      id: true,
+      role: true,
+      email: true,
+      google_id: true,
+      provider: true,
+      status: true,
+      reader: true,
+      author: {
+        include: {
+          social_links: true,
+        },
+      },
+      staff: true,
+      passwordChangedAt: true,
+      join_date: true,
+      updated_at: true,
+    },
+  });
+
+  return user;
+};
+
 const AuthServices = {
   SignUp,
   Login,
@@ -293,6 +322,7 @@ const AuthServices = {
   changePassword,
   forgetPassword,
   resetPassword,
+  getMeFromDB,
 };
 
 export default AuthServices;

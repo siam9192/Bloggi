@@ -104,10 +104,31 @@ const getMyBookmarksFromDB = async (
   };
 };
 
+const checkBookmarkStatusFromDB = async (
+  authUser: IAuthUser,
+  blogId: string | number,
+) => {
+  blogId = parseInt(blogId as string);
+
+  const bookmark = await prisma.bookmark.findFirst({
+    where: {
+      blog_id: blogId,
+      user_id: authUser.id,
+    },
+  });
+
+  const status = bookmark ? true : false;
+
+  return {
+    status,
+  };
+};
+
 const BookmarkServices = {
   createBookmarkIntoDB,
   deleteBookmarkFromDB,
   getMyBookmarksFromDB,
+  checkBookmarkStatusFromDB,
 };
 
 export default BookmarkServices;

@@ -43,7 +43,7 @@ const getAuthorFollowers = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMyFollowers = catchAsync(async (req: Request, res: Response) => {
-  const filterData = Pick(req.query, ["name"]);
+  const filterData = Pick(req.query, ["searchTerm", "followerSince", "status"]);
   const paginationOptions = Pick(req.query, paginationOptionKeys);
   const result = await FollowerServices.getMyFollowersFromDB(
     req.user,
@@ -72,12 +72,25 @@ const getMyFollowingAuthors = catchAsync(
   },
 );
 
+const changeFollowerStatus = catchAsync(async (req: Request, res: Response) => {
+  const result = await FollowerServices.changeFollowerStatus(
+    req.user,
+    req.body,
+  );
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.OK,
+    message: "Follower status changed successfully",
+    data: result,
+  });
+});
+
 const FollowerControllers = {
   createFollower,
   deleteFollower,
   getAuthorFollowers,
   getMyFollowers,
   getMyFollowingAuthors,
+  changeFollowerStatus,
 };
 
 export default FollowerControllers;

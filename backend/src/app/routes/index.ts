@@ -62,8 +62,8 @@ const moduleRoutes: TModuleRoutes = [
     router: BlogReactionRouter,
   },
   {
-    path:"/plans",
-    router:PlanRouter
+    path: "/plans",
+    router: PlanRouter,
   },
   {
     path: "/subscriptions",

@@ -7,7 +7,7 @@ const getStaffsFromDB = async (paginationOptions: IPaginationOptions) => {
     calculatePagination(paginationOptions);
 
   const data = await prisma.staff.findMany({
-    sortOrder: {
+      orderBy: {
       [sortBy]: sortOrder,
     },
   });

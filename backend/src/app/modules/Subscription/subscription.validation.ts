@@ -6,7 +6,6 @@ const PurchasePlanValidation = z.object({
   method: z.enum(Object.values(PaymentMethod) as [string, ...string[]]),
 });
 
-
 const SubscriptionValidations = {
   PurchasePlanValidation,
 };

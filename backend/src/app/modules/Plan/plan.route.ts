@@ -3,7 +3,6 @@ import validateRequest from "../../middlewares/validateRequest";
 import PlanControllers from "./plan.controller";
 import PlanValidations from "./plan.validation";
 
-
 const router = Router();
 
 router.post(
@@ -12,8 +11,8 @@ router.post(
   PlanControllers.createPlan,
 );
 
-router.get("/",PlanControllers.getPlans);
+router.get("/", PlanControllers.getPlans);
 
 const PlanRouter = router;
 
-export default  PlanRouter;
+export default PlanRouter;

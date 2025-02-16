@@ -1,6 +1,5 @@
 import { PlanDiscountType, PlanFeatureStatus } from "@prisma/client";
 
-
 interface IFeature {
   name: string;
   status: `${PlanFeatureStatus}`;

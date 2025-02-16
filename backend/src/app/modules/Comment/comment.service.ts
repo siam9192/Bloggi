@@ -93,7 +93,7 @@ const getBlogCommentsFromDB = async (
     parent: null,
   };
 
-  const data = await prisma.comment.findMany({
+  const comments = await prisma.comment.findMany({
     where: whereConditions,
     take: limit,
     skip,
@@ -101,6 +101,15 @@ const getBlogCommentsFromDB = async (
       [sortBy]: sortOrder,
     },
     include: {
+      reader:{
+        select:{
+            id:true,
+            first_name:true,
+            last_name:true,
+            profile_photo:true
+        }
+      },
+
       _count: {
         select: {
           replies: true,
@@ -126,6 +135,18 @@ const getBlogCommentsFromDB = async (
   const total = await prisma.comment.count({
     where: whereConditions,
   });
+ 
+  const data = comments.map(comment=>{
+    const {reader,...othersData} =  comment;
+    return {
+      ...othersData,
+      reader:{
+        id:reader.id,
+        full_name:[reader.first_name,reader.last_name].join(" "),
+        profile_photo:reader.profile_photo
+      }
+    }
+  })
 
   return {
     data,
@@ -145,9 +166,42 @@ const getBlogCommentRepliesFromDB = async (comment_id: string | number) => {
     parent_id: comment_id,
   };
 
-  const data = await prisma.comment.findMany({
+  const comments = await prisma.comment.findMany({
     where: whereConditions,
+    include: {
+      reader:{
+        select:{
+            id:true,
+            first_name:true,
+            last_name:true,
+            profile_photo:true
+        }
+      },
+
+      _count: {
+        select: {
+          replies: true,
+          reactions: {
+            where: {
+              type: "Like",
+            },
+          },
+        },
+      },
+    },
   });
+
+  const data = comments.map(comment=>{
+    const {reader,...othersData} =  comment;
+    return {
+      ...othersData,
+      reader:{
+        full_name:[reader.first_name,reader.last_name].join(" "),
+        profile_photo:reader.profile_photo
+      }
+    }
+  })
+
 
   return data;
 };

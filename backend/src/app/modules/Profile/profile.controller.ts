@@ -26,7 +26,7 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   const result = await ProfileServices.updateMyProfileIntoDB(req);
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
-    message: "Profile successfully",
+    message: "Profile updated successfully",
     data: result,
   });
 });

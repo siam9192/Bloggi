@@ -22,9 +22,9 @@ const getPlans = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const  PlanControllers = {
+const PlanControllers = {
   createPlan,
-  getPlans
+  getPlans,
 };
 
 export default PlanControllers;

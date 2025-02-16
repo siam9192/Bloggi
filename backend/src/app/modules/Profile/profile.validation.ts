@@ -20,7 +20,8 @@ const UpdateReaderProfileValidation = z
 const UpdateSocialLinkValidation = z.object({
   platform: z.enum(Object.values(SocialPlatform) as [string, ...string[]]),
   url: z.string().url(),
-  isDeleted: z.boolean().default(false),
+  is_deleted: z.boolean().default(false),
+  is_new_added: z.boolean().default(false),
 });
 
 const UpdateAuthorProfileValidation = z

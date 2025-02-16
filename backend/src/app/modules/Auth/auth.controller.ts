@@ -60,6 +60,15 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthServices.getMeFromDB(req.user);
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.OK,
+    message: "Current User retrieved successfully",
+    data: result,
+  });
+});
+
 const AuthControllers = {
   handelSignUp,
   handelLogin,
@@ -67,6 +76,7 @@ const AuthControllers = {
   changePassword,
   forgetPassword,
   resetPassword,
+  getMe,
 };
 
 export default AuthControllers;

@@ -47,7 +47,7 @@ const deleteComment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getComments = catchAsync(async (req: Request, res: Response) => {
+const getBlogComments = catchAsync(async (req: Request, res: Response) => {
   const paginationOptions = Pick(req.params, paginationOptionKeys);
   const result = await CommentServices.getBlogCommentsFromDB(
     req.params.blogId,
@@ -57,7 +57,7 @@ const getComments = catchAsync(async (req: Request, res: Response) => {
   sendSuccessResponse(res, {
     statusCode: httpStatus.CREATED,
     message: "Blog comments retrieved successfully",
-    data: result,
+    ...result,
   });
 });
 
@@ -76,7 +76,7 @@ const getCommentReplies = catchAsync(async (req: Request, res: Response) => {
 const CommentControllers = {
   createComment,
   createCommentReplay,
-  getComments,
+  getBlogComments,
   getCommentReplies,
   deleteComment,
   updateComment,

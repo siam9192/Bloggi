@@ -152,6 +152,8 @@ model Category {
    parent Category? @relation("children",fields: [parent_id],references: [id],onDelete:Cascade ) 
    children Category[] @relation("children")
    blogs Blog[]
+   created_at DateTime @default(now())
+   updated_at DateTime @updatedAt()
    @@map("categories")
 }
 
@@ -161,6 +163,7 @@ model Follower {
   author_id Int  
   reader Reader @relation(fields: [reader_id],references: [id])
   author Author @relation(fields: [author_id],references: [id])
+  status FollowerStatus @default(Active)
   created_at DateTime @default(now())                                   // User being followed
   @@id([reader_id,author_id])
   @@map("followers")
@@ -326,6 +329,7 @@ enum BlogStatus {
   Draft
   Published
   Archived
+  Scheduled
 }
 
 enum BlogPrivacyStatus {
@@ -380,3 +384,8 @@ enum PaymentStatus {
   Timeout
 }
 
+
+enum FollowerStatus {
+  Active
+  Blocked
+}

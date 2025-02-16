@@ -220,15 +220,46 @@ const getCategoriesFromDB = async (
   };
 
   const data = await prisma.category.findMany({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+    },
     select: {
       id: true,
+      parent: {
+        include: {
+          parent: {
+            include: {
+              parent: {
+                include: {
+                  parent: true,
+                },
+              },
+            },
+          },
+        },
+      },
       name: true,
-      parent_id: true,
-      _count: true,
+      slug: true,
     },
-    skip,
-    take: limit,
+  });
+
+  const processData = data.map((item) => {
+    let str;
+    const names: string[] = [];
+    if (item.parent) {
+      let loopParent: any = item.parent;
+      while (loopParent) {
+        names.push(loopParent.name);
+        loopParent = loopParent.parent;
+      }
+    }
+    str = [...names, item.name].join("/");
+    return {
+      id: item.id,
+      name: item.name,
+      slug: item.slug,
+      hierarchyString: str,
+    };
   });
 
   const total = await prisma.category.count({
@@ -243,7 +274,7 @@ const getCategoriesFromDB = async (
 
   return {
     meta,
-    data,
+    data: processData,
   };
 };
 

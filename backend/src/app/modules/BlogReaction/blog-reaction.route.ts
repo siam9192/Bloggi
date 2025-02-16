@@ -15,7 +15,7 @@ router.post(
 );
 
 router.get(
-  "/blogId",
+  "/:blogId",
   auth(UserRole.Reader),
   BlogReactionControllers.getMyBlogReaction,
 );

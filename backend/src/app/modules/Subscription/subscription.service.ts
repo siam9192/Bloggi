@@ -114,7 +114,7 @@ const initPlanSubscription = async (
         start_at,
         end_at,
         validity_days: plan.validity_days,
-        planData:plan
+        planData: plan,
       },
     });
 

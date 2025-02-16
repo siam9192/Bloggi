@@ -38,6 +38,14 @@ router.delete(
   auth(UserRole.Reader),
   FollowerControllers.deleteFollower,
 );
+
+router.patch(
+  "/change-status",
+  auth(UserRole.Author),
+  validateRequest(FollowerValidations.ChangeFollowerStatusValidation),
+  FollowerControllers.changeFollowerStatus,
+);
+
 const FollowerRouter = router;
 
 export default FollowerRouter;

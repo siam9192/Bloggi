@@ -1,5 +1,5 @@
 import { BlogPrivacyStatus, BlogStatus } from "@prisma/client";
-import { z } from "zod";
+import { optional, z } from "zod";
 
 const CreateBlogValidation = z.object({
   title: z.string(),
@@ -8,12 +8,17 @@ const CreateBlogValidation = z.object({
   category_id: z.number(),
   featured_image: z.string().url(),
   is_premium: z.boolean(),
-  tags: z.array(z.string()),
-  publish_date: z.string().date(),
+  tags: z.array(z.string()).optional(),
+  publish_date: z
+    .string()
+    .datetime({ precision: 3 })
+    .default(new Date().toISOString()),
   privacy_status: z.enum(
     Object.values(BlogPrivacyStatus) as [string, ...string[]],
   ),
-  status: z.enum(Object.values(BlogStatus) as [string, ...string[]]),
+  status: z
+    .enum(Object.values(BlogStatus) as [string, ...string[]])
+    .default(BlogStatus.Published),
 });
 
 const UpdateTagValidation = z.object({
@@ -29,8 +34,11 @@ const UpdateBlogValidation = z
     category_id: z.number(),
     featured_image: z.string().url(),
     is_premium: z.boolean(),
-    tag: UpdateTagValidation,
-    publish_date: z.string().date(),
+    tags: UpdateTagValidation.optional(),
+    publish_date: z
+      .string()
+      .datetime({ precision: 3 })
+      .default(new Date().toISOString()),
     privacy_status: z.enum(
       Object.values(BlogPrivacyStatus) as [string, ...string[]],
     ),

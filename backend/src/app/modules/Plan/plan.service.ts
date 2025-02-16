@@ -1,4 +1,3 @@
-
 import prisma from "../../shared/prisma";
 import { ICreatePlanPayload } from "./plan.interface";
 
@@ -24,17 +23,25 @@ const createPlanIntoDB = async (payload: ICreatePlanPayload) => {
   return result;
 };
 
-const getPlansFromDB = async ()=>{
+const getPlansFromDB = async () => {
   return await prisma.plan.findMany({
-    include:{
-      features:true
-    }
-  })
-}
+    where: {
+      name: {
+        in: ["Basic", "Standard", "Premium"],
+      },
+    },
+    include: {
+      features: true,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+};
 
 const PlanServices = {
- createPlanIntoDB,
- getPlansFromDB
+  createPlanIntoDB,
+  getPlansFromDB,
 };
 
 export default PlanServices;

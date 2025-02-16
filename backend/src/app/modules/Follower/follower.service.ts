@@ -1,4 +1,4 @@
-import { Follower, Prisma } from "@prisma/client";
+import { Follower, FollowerStatus, Prisma } from "@prisma/client";
 import prisma from "../../shared/prisma";
 import { IAuthUser } from "../Auth/auth.interface";
 import AppError from "../../Errors/AppError";
@@ -84,7 +84,7 @@ const getAuthorFollowersFromDB = async (
 
   const whereConditions: Prisma.FollowerWhereInput = {};
 
-  if (filterData.name) {
+  if (filterData.searchTerm) {
     whereConditions;
   }
 
@@ -120,9 +120,9 @@ const getMyFollowersFromDB = async (
   filter: IFollowersFilterRequest,
   options: IPaginationOptions,
 ) => {
-  const { limit, skip, page } = calculatePagination(options);
+  const { limit, skip, page, sortBy, sortOrder } = calculatePagination(options);
 
-  const { name, followerSince } = filter;
+  const { searchTerm: name, followerSince, status } = filter;
 
   const andConditions: Prisma.FollowerWhereInput[] = [];
 
@@ -136,6 +136,7 @@ const getMyFollowersFromDB = async (
     if (lastName) {
       filObj.last_name = lastName;
     }
+
     andConditions.push({
       reader: filObj,
     });
@@ -149,10 +150,17 @@ const getMyFollowersFromDB = async (
     });
   }
 
+  if (status && Object.values(FollowerStatus).includes(status)) {
+    andConditions.push({
+      status,
+    });
+  }
+
   const whereConditions: Prisma.FollowerWhereInput = {
     author: {
       user_id: authUser.id,
     },
+    AND: andConditions,
   };
 
   const data = await prisma.follower.findMany({
@@ -168,12 +176,29 @@ const getMyFollowersFromDB = async (
     },
     take: limit,
     skip,
+    orderBy:
+      sortBy === "name"
+        ? ({
+            reader: {
+              first_name: sortOrder,
+            },
+          } as any)
+        : {
+            [sortBy]: sortOrder,
+          },
   });
 
   const total = await prisma.follower.count({ where: whereConditions });
 
+  const formatData = data.map((item) => ({
+    reader_id: item.reader_id,
+    full_name: item.reader.first_name + " " + item.reader.last_name,
+    profile_photo: item.reader.profile_photo,
+    status: item.status,
+    created_at: item.created_at,
+  }));
   return {
-    data,
+    data: formatData,
     meta: {
       limit,
       page,
@@ -212,12 +237,41 @@ const getMyFollowingAuthorsFromDB = async (
   };
 };
 
+const changeFollowerStatus = async (
+  authUser: IAuthUser,
+  payload: { reader_id: number; status: `${FollowerStatus}` },
+) => {
+  const follower = await prisma.follower.findUnique({
+    where: {
+      reader_id_author_id: {
+        reader_id: payload.reader_id,
+        author_id: authUser.authorId!,
+      },
+    },
+  });
+  if (!follower) throw new AppError(httpStatus.NOT_FOUND, "Follower not found");
+  await prisma.follower.update({
+    where: {
+      reader_id_author_id: {
+        reader_id: payload.reader_id,
+        author_id: authUser.authorId!,
+      },
+    },
+    data: {
+      status: payload.status,
+    },
+  });
+
+  return null;
+};
+
 const FollowerServices = {
   createFollowerInto,
   deleteFollowerFromDB,
   getAuthorFollowersFromDB,
   getMyFollowersFromDB,
   getMyFollowingAuthorsFromDB,
+  changeFollowerStatus,
 };
 
 export default FollowerServices;

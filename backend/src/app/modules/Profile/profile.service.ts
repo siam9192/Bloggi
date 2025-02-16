@@ -26,7 +26,16 @@ const getUserProfileByIdFromDB = async (id: string | number) => {
           },
         },
       },
-      reader: true,
+      reader: {
+        include: {
+          _count: {
+            select: {
+              following: true,
+              comments: true,
+            },
+          },
+        },
+      },
       staff: true,
     },
   });
@@ -40,11 +49,12 @@ const getUserProfileByIdFromDB = async (id: string | number) => {
       result = {
         email: user.email,
         role: user.role,
-        name: {
-          first: profile.first_name,
-          last: profile.last_name,
-        },
+        first_name: profile.first_name,
+        last_name: profile.last_name,
         profile_photo: profile.profile_photo,
+        count: {
+          ...profile._count,
+        },
         status: user.status,
         join_date: user.join_date,
       };
@@ -142,41 +152,47 @@ const updateMyProfileIntoDB = async (req: Request) => {
 
         // Filter updated social links
         const updatedSocialLinks = social_links.filter(
-          (ele) => ele.is_deleted === false || ele.is_deleted === undefined,
+          (ele) =>
+            ele.is_deleted === false ||
+            ele.is_deleted === undefined ||
+            ele.is_new_added === false ||
+            ele.is_new_added === undefined,
         );
 
         // If deleted social links exits then delete the social links from DB
         if (deletedSocialLinks.length) {
-          deletedSocialLinks.forEach(async (ele) => {
-            await trClient.socialLink.deleteMany({
+          for (const link of deletedSocialLinks) {
+            await trClient.socialLink.delete({
               where: {
-                author_id: authorData?.id,
-                platform: ele.platform,
+                author_id_platform: {
+                  author_id: authorData.id,
+                  platform: link.platform,
+                },
               },
             });
-          });
+          }
         }
 
         // If updated social links exists then upsert the social links into DB
         if (updatedSocialLinks.length) {
-          updatedSocialLinks.forEach(async (ele) => {
+          for (const link of social_links) {
             await trClient.socialLink.upsert({
               where: {
                 author_id_platform: {
                   author_id: authorData.id,
-                  platform: ele.platform,
+                  platform: link.platform,
                 },
               },
               update: {
-                url: ele.url,
+                url: link.url,
               },
               create: {
                 author_id: authorData.id,
-                platform: ele.platform,
-                url: ele.url,
+                platform: link.platform,
+                url: link.url,
               },
             });
-          });
+          }
         }
       }
 

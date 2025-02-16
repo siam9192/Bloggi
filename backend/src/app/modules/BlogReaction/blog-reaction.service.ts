@@ -64,6 +64,7 @@ const UpsertBlogReactionIntoDB = async (
         type: payload.type,
       },
     });
+    
   }
 
   return result;
@@ -76,25 +77,32 @@ const getMyBlogReactionsFromDB = async (
   // Type cast blogId  string => number
   blogId = Number(blogId);
 
-  const reader = await prisma.reader.findFirst({
+  return await prisma.blogReaction.findUnique({
     where: {
-      user_id: authUser.id,
+      blog_id_reader_id: {
+        blog_id: blogId,
+        reader_id: authUser.readerId!,
+      },
     },
     select: {
-      id: true,
+      blog_id: true,
+      type: true,
     },
   });
+};
 
-  //   Check reader existence
-  if (!reader) {
-    throw new AppError(httpStatus.NOT_FOUND, "Profile not found");
-  }
+const getBlogReactionsFromDB = async (
+  authUser: IAuthUser,
+  blogId: string | number,
+) => {
+  // Type cast blogId  string => number
+  blogId = Number(blogId);
 
   return await prisma.blogReaction.findUnique({
     where: {
       blog_id_reader_id: {
         blog_id: blogId,
-        reader_id: reader.id,
+        reader_id: authUser.readerId!,
       },
     },
     select: {

@@ -15,7 +15,7 @@ import { calculatePagination } from "../../helpers/paginationHelper";
 import AppError from "../../Errors/AppError";
 import httpStatus from "../../shared/http-status";
 import { IAuthUser } from "../Auth/auth.interface";
-import { blogsResultFormat } from "./blog,constant";
+import { blogsResultFormat } from "./blog.constant";
 import { generateSlug, validateDate } from "../../utils/function";
 
 const createBlogIntoDB = async (
@@ -57,7 +57,7 @@ const createBlogIntoDB = async (
   } while (true);
 
   const result = await prisma.$transaction(async (trClient) => {
-    othersBlogData.publish_date = new Date();
+    othersBlogData.publish_date = new Date(othersBlogData.publish_date);
 
     // Create blog
     const createdBlog = await trClient.blog.create({
@@ -68,30 +68,82 @@ const createBlogIntoDB = async (
       },
     });
 
-    const tags = payload.tags.map((tag) => ({
-      name: tag,
-      blog_id: createdBlog.id,
-    }));
-
-    // Create blog tags
-    const createdBlogs = await trClient.blogTag.createMany({
-      data: tags,
-    });
+    if (tags && tags.length) {
+      const tags = payload.tags?.map((tag) => ({
+        name: tag,
+        blog_id: createdBlog.id,
+      }));
+      // Create blog tags
+      const createdBlogs = await trClient.blogTag.createMany({
+        data: tags,
+      });
+    }
 
     return {
       ...createdBlog,
-      tags: createdBlogs,
     };
   });
 
   return result;
 };
 
+const getBlogByIdFromDB = async (authUser: IAuthUser, id: string | number) => {
+  id = Number(id);
+  const blog = await prisma.blog.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      _count: true,
+      tags: true,
+      category: {
+        include: {
+          parent: {
+            include: {
+              parent: {
+                include: {
+                  parent: {
+                    include: {
+                      parent: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  if (!blog) throw new AppError(httpStatus.NOT_FOUND, "blog not found");
+
+  if (
+    authUser.role === UserRole.Author &&
+    authUser.authorId !== blog?.author_id
+  ) {
+    throw new AppError(httpStatus.BAD_GATEWAY, "Bad Gatway!");
+  }
+  let str;
+  const names: string[] = [];
+  if (blog.category.parent) {
+    let loopParent: any = blog.category.parent;
+    while (loopParent) {
+      names.push(loopParent.name);
+      loopParent = loopParent.parent;
+    }
+  }
+  str = [...names, blog.category.name].join("/");
+  const data: any = blog;
+  data.category.hierarchyString = str;
+  return blog;
+};
+
 const getBlogsFromDB = async (
+  authUser: IAuthUser,
   filter: IBlogFilterOptions,
   options: IPaginationOptions,
 ) => {
-  const { searchTerm, categories, type } = filter;
+  const { searchTerm, categories, type, startDate, endDate } = filter;
 
   const { limit, skip, page } = calculatePagination(options);
 
@@ -134,6 +186,34 @@ const getBlogsFromDB = async (
     });
   }
 
+  if (startDate || endDate) {
+    if (
+      startDate &&
+      validateDate(startDate) &&
+      endDate &&
+      validateDate(endDate)
+    ) {
+      andConditions.push({
+        created_at: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+      });
+    } else if (startDate && validateDate(startDate)) {
+      andConditions.push({
+        created_at: {
+          gte: new Date(startDate),
+        },
+      });
+    } else if (endDate && validateDate(endDate)) {
+      andConditions.push({
+        created_at: {
+          lte: new Date(endDate),
+        },
+      });
+    }
+  }
+
   if (type && ["premium", "free"].includes(type)) {
     andConditions.push({
       is_premium: type === "free" ? false : true,
@@ -144,7 +224,7 @@ const getBlogsFromDB = async (
     privacy_status: BlogPrivacyStatus.Public,
   };
 
-  const data = await prisma.blog.findMany({
+  const blogs = await prisma.blog.findMany({
     where: whereConditions,
     skip,
     take: limit,
@@ -164,14 +244,30 @@ const getBlogsFromDB = async (
       },
       category: {
         select: {
+          id: true,
           name: true,
+          slug: true,
         },
       },
       tags: true,
     },
   });
 
-  const result = data.map((item) => {
+  let bookmarkedBlogsId: number[] = [];
+
+  if (authUser) {
+    const blogsId = await prisma.bookmark.findMany({
+      where: {
+        user_id: authUser.id,
+      },
+      select: {
+        blog_id: true,
+      },
+    });
+    bookmarkedBlogsId = blogsId.map((item) => item.blog_id);
+  }
+
+  const data = blogs.map((item) => {
     const author = item.author;
     return {
       title: item.title,
@@ -180,7 +276,11 @@ const getBlogsFromDB = async (
       slug: item.slug,
       likes_count: item.likes_count,
       dislikes_count: item.dislikes_count,
-      category: item.category.name,
+      category: {
+        id: item.category.id,
+        name: item.category.name,
+        slug: item.category.slug,
+      },
       author: {
         full_name: author.first_name + " " + author.last_name,
         profile_photo: author.profile_photo,
@@ -188,6 +288,7 @@ const getBlogsFromDB = async (
       is_premium: item.is_premium,
       publish_date: item.publish_date,
       created_at: item.created_at,
+      is_bookmarked: bookmarkedBlogsId.includes(item.id),
     };
   });
 
@@ -202,7 +303,7 @@ const getBlogsFromDB = async (
   };
 
   return {
-    data: result,
+    data,
     meta,
   };
 };
@@ -222,8 +323,21 @@ const getBlogForReadBySlugFromDB = async (
           first_name: true,
           last_name: true,
           profile_photo: true,
+          _count: {
+            select: {
+              followers: true,
+            },
+          },
         },
       },
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      tags: true,
     },
   });
 
@@ -231,6 +345,9 @@ const getBlogForReadBySlugFromDB = async (
   if (!blog) {
     throw new AppError(httpStatus.NOT_FOUND, "Blog not found");
   }
+
+  let isBookmarked = false;
+  let reactionType;
 
   // Check is user role is reader and is the blog is premium
   if (authUser && authUser.role === UserRole.Reader) {
@@ -266,6 +383,38 @@ const getBlogForReadBySlugFromDB = async (
       }
     }
 
+    const bookmarkedBlog = await prisma.bookmark.findUnique({
+      where: {
+        blog_id_user_id: {
+          blog_id: blog.id,
+          user_id: authUser.id,
+        },
+      },
+      select: {
+        blog_id: true,
+      },
+    });
+
+    if (bookmarkedBlog) isBookmarked = true;
+    
+    if(authUser.readerId) {
+      
+    const readerReaction = await prisma.blogReaction.findUnique({
+      where:{
+      blog_id_reader_id:{
+        blog_id:blog.id,
+        reader_id:authUser.readerId
+      }
+      },
+      select:{
+        type:true
+      }
+    })
+
+    if(readerReaction)  reactionType = readerReaction.type;
+    }
+
+
     // Upsert blog history
     await prisma.blogReadHistory.upsert({
       where: {
@@ -298,7 +447,20 @@ const getBlogForReadBySlugFromDB = async (
     },
   });
 
-  return blog;
+  const { author, ...othersData } = blog;
+  const data: any = {
+    ...othersData,
+    author: {
+      full_name: [author.first_name, author.last_name].join(" "),
+      profile_photo: author.profile_photo,
+      followers_count: author._count.followers,
+    },
+    reaction_type:reactionType||null,
+    is_bookmarked: isBookmarked
+   
+  };
+
+  return data;
 };
 
 const getMyBlogsFromDB = async (
@@ -315,7 +477,7 @@ const getMyBlogsFromDB = async (
     ...otherFilterOptions
   } = filterOptions;
 
-  const { limit, skip } = calculatePagination(options);
+  const { page, limit, skip } = calculatePagination(options);
 
   const andConditions: Prisma.BlogWhereInput[] = [
     {
@@ -422,12 +584,25 @@ const getMyBlogsFromDB = async (
           name: true,
         },
       },
+      _count: true,
     },
   });
 
-  const result = blogsResultFormat(blogs);
+  const data = blogsResultFormat(blogs);
+  const total = await prisma.blog.count({
+    where: whereConditions,
+  });
 
-  return result;
+  const meta = {
+    page,
+    limit,
+    total,
+  };
+
+  return {
+    data,
+    meta,
+  };
 };
 
 const getBlogsForManageFromDB = async (
@@ -734,6 +909,91 @@ const getTrendingBlogsFromDB = async (categoryId: string | number) => {
   return result;
 };
 
+const getRelatedBlogsFromDB = async (slug: string) => {
+  const blog = await prisma.blog.findUnique({
+    where: {
+      slug,
+    },
+    include: {
+      tags: true,
+      category: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+  if (!blog) throw new AppError(httpStatus.NOT_FOUND, "Blog not found");
+
+  const blogs = await prisma.blog.findMany({
+    where: {
+      OR: [
+        {
+          category: {
+            id: blog.category.id,
+          },
+        },
+        {
+          tags: {
+            some: {
+              name: {
+                in: blog.tags.map((item) => item.name),
+              },
+            },
+          },
+        },
+      ],
+      id: {
+        not: blog.id,
+      },
+    },
+    include: {
+      author: {
+        select: {
+          first_name: true,
+          last_name: true,
+          profile_photo: true,
+        },
+      },
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      tags: true,
+    },
+    take: 6,
+  });
+
+  const data = blogs.map((item) => {
+    const author = item.author;
+    return {
+      title: item.title,
+      short_description: item.short_description,
+      featured_image: item.featured_image,
+      slug: item.slug,
+      likes_count: item.likes_count,
+      dislikes_count: item.dislikes_count,
+      category: {
+        id: item.category.id,
+        name: item.category.name,
+        slug: item.category.slug,
+      },
+      author: {
+        full_name: author.first_name + " " + author.last_name,
+        profile_photo: author.profile_photo,
+      },
+      is_premium: item.is_premium,
+      publish_date: item.publish_date,
+      created_at: item.created_at,
+    };
+  });
+
+  return data;
+};
+
 const getBlogAnalyzingDataFromDB = async (id: string | number) => {
   id = Number(id);
 
@@ -746,16 +1006,55 @@ const getBlogAnalyzingDataFromDB = async (id: string | number) => {
   if (!blog) throw new AppError(httpStatus.NOT_FOUND, "Blog not found");
 };
 
+const getBlogStatesFromDB = async (id: string | number) => {
+  id = Number(id);
+  const blog = await prisma.blog.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
+  });
+  if (!blog) throw new AppError(httpStatus.NOT_FOUND, "blog not found");
+  const data = {
+    id: blog.id,
+    title: blog.title,
+    slug: blog.slug,
+    category: blog.category,
+    total_views: blog.views_count,
+    total_likes: blog.likes_count,
+    total_dislikes: blog.dislikes_count,
+    total_comments: blog._count.comments,
+  };
+
+  return data;
+};
+
 const BlogServices = {
   createBlogIntoDB,
   getBlogsFromDB,
+  getBlogByIdFromDB,
   getBlogForReadBySlugFromDB,
+  getRelatedBlogsFromDB,
   deleteBlogByIdFromDB,
   updateBlogByIdFromDB,
   getMyBlogsFromDB,
   getBlogsForManageFromDB,
   getRecentBlogsFromDB,
   getTrendingBlogsFromDB,
+  getBlogStatesFromDB,
 };
 
 export default BlogServices;
