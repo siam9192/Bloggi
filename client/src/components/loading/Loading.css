@@ -1,0 +1,78 @@
+.loading-line {
+
+animation: loading-line 1s  infinite;
+}
+
+@keyframes loading-line {
+    0%{
+        transform: translateX(0);
+    }
+    100%{
+        transform: translateX(100%);
+    }
+}
+
+
+
+
+
+
+/* HTML: <div class="loader"></div> */
+.loader {
+    width: 65px;
+    aspect-ratio: 1;
+    position: relative;
+  }
+  .loader:before 
+    {
+        content: "";
+        position: absolute;
+        border-radius: 50px;
+    
+        background-color: rgb(255, 0, 149);
+        animation: l4 2.5s infinite;
+      }
+  
+  .loader:after {
+    content: "";
+    position: absolute;
+    border-radius: 50px;
+   
+    background-color: rgb(0, 195, 255);
+    animation: l4 2.5s infinite;
+  }
+  .loader:after {
+    animation-delay: -1.25s;
+  }
+  @keyframes l4 {
+    0% {
+      inset: 0 35px 35px 0;
+    }
+    12.5% {
+      inset: 0 35px 0 0;
+    }
+    25% {
+      inset: 35px 35px 0 0;
+    }
+    37.5% {
+      inset: 35px 0 0 0;
+    }
+    50% {
+      inset: 35px 0 0 35px;
+    }
+    62.5% {
+      inset: 0 0 0 35px;
+    }
+    75% {
+      inset: 0 0 35px 35px;
+    }
+    87.5% {
+      inset: 0 0 35px 0;
+    }
+    100% {
+      inset: 0 35px 35px 0;
+    }
+  }
+
+
+  

@@ -1,0 +1,8 @@
+.hero {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: background-image 0.5s ease-in-out;
+    object-fit: cover;
+    
+}
