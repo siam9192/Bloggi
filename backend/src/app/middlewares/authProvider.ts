@@ -46,7 +46,11 @@ function authProvider(...requiredRoles: UserRole[]) {
       if (user.status === UserStatus.Blocked) {
         throw new AppError(httpStatus.FORBIDDEN, "This user is blocked ! !");
       }
-      if (requiredRoles && !requiredRoles.includes(role)) {
+      if (
+        requiredRoles &&
+        requiredRoles.length &&
+        !requiredRoles.includes(role)
+      ) {
         throw new AppError(
           httpStatus.UNAUTHORIZED,
           "You are not authorized  !",

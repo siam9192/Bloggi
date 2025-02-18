@@ -22,6 +22,7 @@
   "scripts": {
     "start:prod": "node ./src/dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/app/server.ts",
+    "postinstall": "prisma generate",
     "build": "tsc",
     "lint": "eslint src/app/*.ts",
     "lint:fix": "npx eslint  --fix",

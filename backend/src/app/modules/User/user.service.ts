@@ -1,4 +1,4 @@
-import { Prisma, Provider, UserRole } from "@prisma/client";
+import { Prisma, Provider, UserRole, UserStatus } from "@prisma/client";
 import AppError from "../../Errors/AppError";
 import httpStatus from "../../shared/http-status";
 import prisma from "../../shared/prisma";
@@ -272,12 +272,50 @@ const softDeleteUserIntoDB = async (userId: string) => {
   return null;
 };
 
+
+const getUsersOverviewDataFromDB = async ()=>{
+  const userWhereConditions = {
+    status: {
+      not: UserStatus.Deleted,
+    },
+  };
+
+  const recentDate = new Date(new Date().toDateString());
+  recentDate.setDate(new Date().getDate()-10)
+
+  const totalUsers = await prisma.user.count({
+    where: userWhereConditions,
+  });
+
+  const totalRecentUsers = await prisma.user.count({
+    where: {
+      join_date: {
+        gte: recentDate
+      },
+    },
+  });
+  
+  const totalBlockedUsers = await prisma.user.count({
+    where: {
+      status: UserStatus.Blocked,
+    },
+  });
+
+  return {
+    totalUsers,
+    totalBlockedUsers,
+    totalRecentUsers
+  }
+
+}
+
 const UserServices = {
   createStaffIntoDB,
   createAuthorIntoDB,
   ChangeUserStatusIntoDB,
   getUsersFromDB,
   softDeleteUserIntoDB,
+  getUsersOverviewDataFromDB
 };
 
 export default UserServices;

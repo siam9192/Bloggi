@@ -14,6 +14,7 @@ import BlogReactionRouter from "../modules/BlogReaction/blog-reaction.route";
 import StaffRouter from "../modules/Staff/staff.route";
 import OverviewRouter from "../modules/Overview/overview.route";
 import PlanRouter from "../modules/Plan/plan.route";
+import AuthorRouter from "../modules/Author/author.route";
 
 const router = Router();
 
@@ -84,6 +85,10 @@ const moduleRoutes: TModuleRoutes = [
   {
     path: "/overview",
     router: OverviewRouter,
+  },
+  {
+    path: "/authors",
+    router: AuthorRouter,
   },
 ];
 

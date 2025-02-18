@@ -24,9 +24,21 @@ const getAuthorOverviewData = catchAsync(
   },
 );
 
+const  getUsersOverviewData = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await OverviewServices.getAuthorOverviewDataFromDB(req.user);
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      message: "Overview data retrieved successfully",
+      data: result,
+    });
+  },
+);
+
 const OverviewControllers = {
   getAllOverviewData,
   getAuthorOverviewData,
+  getUsersOverviewData
 };
 
 export default OverviewControllers;

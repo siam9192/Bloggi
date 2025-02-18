@@ -1,39 +1,79 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+var __awaiter =
+  (this && this.__awaiter) ||
+  function (thisArg, _arguments, P, generator) {
+    function adopt(value) {
+      return value instanceof P
+        ? value
+        : new P(function (resolve) {
+            resolve(value);
+          });
+    }
     return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      function fulfilled(value) {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function rejected(value) {
+        try {
+          step(generator["throw"](value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function step(result) {
+        result.done
+          ? resolve(result.value)
+          : adopt(result.value).then(fulfilled, rejected);
+      }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+  };
+var __importDefault =
+  (this && this.__importDefault) ||
+  function (mod) {
+    return mod && mod.__esModule ? mod : { default: mod };
+  };
 Object.defineProperty(exports, "__esModule", { value: true });
 const catchAsync_1 = __importDefault(require("../../shared/catchAsync"));
 const response_1 = require("../../shared/response");
 const http_status_1 = __importDefault(require("../../shared/http-status"));
-const comment_reaction_service_1 = __importDefault(require("./comment-reaction.service"));
-const upsertCommentReaction = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield comment_reaction_service_1.default.UpsertCommentReaction(req.user, req.body);
+const comment_reaction_service_1 = __importDefault(
+  require("./comment-reaction.service"),
+);
+const upsertCommentReaction = (0, catchAsync_1.default)((req, res) =>
+  __awaiter(void 0, void 0, void 0, function* () {
+    const result =
+      yield comment_reaction_service_1.default.UpsertCommentReaction(
+        req.user,
+        req.body,
+      );
     (0, response_1.sendSuccessResponse)(res, {
-        statusCode: http_status_1.default.CREATED,
-        message: "Created successfully",
-        data: result,
+      statusCode: http_status_1.default.CREATED,
+      message: "Created successfully",
+      data: result,
     });
-}));
-const getMyCommentReactions = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield comment_reaction_service_1.default.getMyCommentReactionsFromDB(req.user, req.params.blogId);
+  }),
+);
+const getMyCommentReactions = (0, catchAsync_1.default)((req, res) =>
+  __awaiter(void 0, void 0, void 0, function* () {
+    const result =
+      yield comment_reaction_service_1.default.getMyCommentReactionsFromDB(
+        req.user,
+        req.params.blogId,
+      );
     (0, response_1.sendSuccessResponse)(res, {
-        statusCode: http_status_1.default.CREATED,
-        message: "retrieved successfully",
-        data: result,
+      statusCode: http_status_1.default.CREATED,
+      message: "retrieved successfully",
+      data: result,
     });
-}));
+  }),
+);
 const CommentReactionControllers = {
-    upsertCommentReaction,
-    getMyCommentReactions,
+  upsertCommentReaction,
+  getMyCommentReactions,
 };
 exports.default = CommentReactionControllers;

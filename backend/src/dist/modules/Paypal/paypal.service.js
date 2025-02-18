@@ -1,2 +1,2 @@
 "use strict";
-const initPayment = () => { };
+const initPayment = () => {};

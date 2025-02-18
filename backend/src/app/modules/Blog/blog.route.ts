@@ -16,7 +16,8 @@ router.post(
 );
 
 router.get("/", BlogControllers.getBlogs);
-router.get("/recent", BlogControllers.getRecentBlogs);
+router.get("/recent",authProvider(),BlogControllers.getRecentBlogs);
+router.get("/popular",authProvider(),BlogControllers.getRecentBlogs);
 router.get("/trending/:categoryId", BlogControllers.getTrendingBlogs);
 router.get("/my", auth(UserRole.Author), BlogControllers.getMyBlogs);
 router.get(

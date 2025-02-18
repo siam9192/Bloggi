@@ -27,7 +27,7 @@ router.patch(
 );
 
 router.get("/", UserControllers.getUsers);
-
+router.get("/overview",UserControllers.getUsersOverviewData)
 router.delete("/:userId", UserControllers.softDeleteUser);
 const UserRouter = router;
 

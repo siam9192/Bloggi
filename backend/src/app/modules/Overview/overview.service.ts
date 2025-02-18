@@ -211,9 +211,51 @@ const getAuthorOverviewDataFromDB = async (authUser: IAuthUser) => {
   };
 };
 
+const getUsersOverviewDataFromDB = async ()=>{
+  const userWhereConditions = {
+    status: {
+      not: UserStatus.Deleted,
+    },
+  };
+
+  const recentDate = new Date(new Date().toDateString());
+  recentDate.setDate(new Date().getDate()-10)
+
+  const totalUsers = await prisma.user.count({
+    where: userWhereConditions,
+  });
+
+  const totalRecentUsers = await prisma.user.findMany({
+    where: {
+      join_date: {
+        gte: recentDate
+      },
+    },
+    include: {
+      reader: true,
+      author: true,
+      staff: true,
+    },
+  });
+  
+  const totalBlockedUsers = await prisma.user.count({
+    where: {
+      status: UserStatus.Blocked,
+    },
+  });
+
+  return {
+    totalUsers,
+    totalBlockedUsers,
+    totalRecentUsers
+  }
+
+}
+
 const OverviewServices = {
   getAllOverviewDataFromDB,
   getAuthorOverviewDataFromDB,
+  getUsersOverviewDataFromDB
 };
 
 export default OverviewServices;

@@ -102,11 +102,22 @@ const getBlogsForManage = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getRecentBlogs = catchAsync(async (req: Request, res: Response) => {
-  const result = await BlogServices.getRecentBlogsFromDB();
+  const paginationOptions = Pick(req.query,paginationOptionKeys)
+  const result = await BlogServices.getRecentBlogsFromDB(req.user,paginationOptions as any);
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blogs retrieved successfully",
-    data: result,
+    ...result
+  });
+});
+
+const getPopularBlogs = catchAsync(async (req: Request, res: Response) => {
+  const paginationOptions = Pick(req.query,paginationOptionKeys)
+  const result = await BlogServices.getPopularBlogsFromDB(req.user,paginationOptions as any);
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.OK,
+    message: "Blogs retrieved successfully",
+    ...result
   });
 });
 
@@ -117,7 +128,7 @@ const getTrendingBlogs = catchAsync(async (req: Request, res: Response) => {
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blogs retrieved successfully",
-    data: result,
+    ...result
   });
 });
 
@@ -163,6 +174,7 @@ const getRelatedBlogs = catchAsync(async (req: Request, res: Response) => {
 const BlogControllers = {
   createBlog,
   getBlogs,
+  getPopularBlogs,
   getRecentBlogs,
   getTrendingBlogs,
   getMyBlogs,

@@ -62,12 +62,22 @@ const softDeleteUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const  getUsersOverviewData = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserServices.getUsersOverviewDataFromDB()
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.OK,
+    message: "Retrieved successfully",
+    data: result,
+  });
+});
+
 const UserControllers = {
   createStaff,
   createAuthor,
   changeUserStatus,
   getUsers,
   softDeleteUser,
+  getUsersOverviewData
 };
 
 export default UserControllers;

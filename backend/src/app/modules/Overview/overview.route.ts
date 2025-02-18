@@ -11,6 +11,7 @@ router.get(
   auth(UserRole.Author),
   OverviewControllers.getAuthorOverviewData,
 );
+
 const OverviewRouter = router;
 
 export default OverviewRouter;

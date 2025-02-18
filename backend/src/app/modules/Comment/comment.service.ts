@@ -101,13 +101,13 @@ const getBlogCommentsFromDB = async (
       [sortBy]: sortOrder,
     },
     include: {
-      reader:{
-        select:{
-            id:true,
-            first_name:true,
-            last_name:true,
-            profile_photo:true
-        }
+      reader: {
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          profile_photo: true,
+        },
       },
 
       _count: {
@@ -135,18 +135,18 @@ const getBlogCommentsFromDB = async (
   const total = await prisma.comment.count({
     where: whereConditions,
   });
- 
-  const data = comments.map(comment=>{
-    const {reader,...othersData} =  comment;
+
+  const data = comments.map((comment) => {
+    const { reader, ...othersData } = comment;
     return {
       ...othersData,
-      reader:{
-        id:reader.id,
-        full_name:[reader.first_name,reader.last_name].join(" "),
-        profile_photo:reader.profile_photo
-      }
-    }
-  })
+      reader: {
+        id: reader.id,
+        full_name: [reader.first_name, reader.last_name].join(" "),
+        profile_photo: reader.profile_photo,
+      },
+    };
+  });
 
   return {
     data,
@@ -169,13 +169,13 @@ const getBlogCommentRepliesFromDB = async (comment_id: string | number) => {
   const comments = await prisma.comment.findMany({
     where: whereConditions,
     include: {
-      reader:{
-        select:{
-            id:true,
-            first_name:true,
-            last_name:true,
-            profile_photo:true
-        }
+      reader: {
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+          profile_photo: true,
+        },
       },
 
       _count: {
@@ -191,17 +191,16 @@ const getBlogCommentRepliesFromDB = async (comment_id: string | number) => {
     },
   });
 
-  const data = comments.map(comment=>{
-    const {reader,...othersData} =  comment;
+  const data = comments.map((comment) => {
+    const { reader, ...othersData } = comment;
     return {
       ...othersData,
-      reader:{
-        full_name:[reader.first_name,reader.last_name].join(" "),
-        profile_photo:reader.profile_photo
-      }
-    }
-  })
-
+      reader: {
+        full_name: [reader.first_name, reader.last_name].join(" "),
+        profile_photo: reader.profile_photo,
+      },
+    };
+  });
 
   return data;
 };

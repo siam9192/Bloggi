@@ -64,7 +64,6 @@ const UpsertBlogReactionIntoDB = async (
         type: payload.type,
       },
     });
-    
   }
 
   return result;
