@@ -16,10 +16,12 @@ const userApi = baseApi.injectEndpoints({
       transformResponse: (response: IResponse<IUser[]>) => {
         return response;
       },
+      providesTags: ["users"],
     }),
     createAuthor: builder.mutation({
       query: (payload: any) => {
         return {
+          method: "POST",
           url: "/users/create-author",
           body: payload,
         };
@@ -27,6 +29,31 @@ const userApi = baseApi.injectEndpoints({
       transformResponse: (response: IResponse<IUser[]>) => {
         return response;
       },
+    }),
+    changeUserStatus: builder.mutation({
+      query: (payload: any) => {
+        return {
+          method: "PATCH",
+          url: "/users/change-status",
+          body: payload,
+        };
+      },
+      transformResponse: (response: IResponse<null>) => {
+        return response;
+      },
+      invalidatesTags: ["users"],
+    }),
+    deleteUser: builder.mutation({
+      query: (userId: number) => {
+        return {
+          method: "DELETE",
+          url: `/users/${userId}`,
+        };
+      },
+      transformResponse: (response: IResponse<null>) => {
+        return response;
+      },
+      invalidatesTags: ["users"],
     }),
     getUsersOverviewData: builder.query({
       query: () => {
@@ -42,4 +69,9 @@ const userApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetUsersQuery, useGetUsersOverviewDataQuery } = userApi;
+export const {
+  useGetUsersQuery,
+  useGetUsersOverviewDataQuery,
+  useDeleteUserMutation,
+  useChangeUserStatusMutation,
+} = userApi;

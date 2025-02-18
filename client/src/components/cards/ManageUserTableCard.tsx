@@ -53,7 +53,7 @@ const ManageUserTableCard = ({ user }: IProps) => {
         <button className="p-2 bg-gray-50 text-primary_color hover:text-blue-500">
           View Profile
         </button>
-        <UserActions />
+        <UserActions status={user.status} userId={user.id} />
       </td>
     </tr>
   );

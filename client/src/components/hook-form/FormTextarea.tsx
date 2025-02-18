@@ -29,7 +29,7 @@ const FormTextArea = ({ name, label, placeholder, className }: TFormTextAreaProp
             <textarea
               className={
                 className ||
-                "w-full mt-1 px-2 py-3 outline-2  bg-gray-100 rounded-md  dark:text-slate-100 dark:bg-dark_color dark:border-opacity-35  font-medium   h-52 resize-none"
+                "w-full mt-1 px-2 py-3 outline-2  bg-gray-50 rounded-md    h-52 resize-none"
               }
               {...field}
               value={field.value || ""}

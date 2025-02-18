@@ -17,5 +17,5 @@ export const baseApi = createApi({
   }),
 
   endpoints: (builder) => ({}),
-  tagTypes: ["my-blogs", "blog-comments", "blog-comments-replies"],
+  tagTypes: ["my-blogs", "blog-comments", "blog-comments-replies", "users"],
 });

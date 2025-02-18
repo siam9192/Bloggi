@@ -2,8 +2,6 @@
 
 import axiosInstance from "@/axios-instance";
 import { IResponse } from "@/types/response.type";
-import { IUser } from "@/types/user.type";
-import { cookies } from "next/headers";
 
 export const createAuthor = async (payload: any) => {
   try {

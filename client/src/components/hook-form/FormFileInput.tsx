@@ -2,23 +2,14 @@
 import { Controller, FieldError, useFormContext } from "react-hook-form";
 
 type TInputProps = {
-  type?: string;
   name: string;
   label?: string;
-  placeholder?: string;
+  accept: string;
   className?: string;
-  options: IOption[];
-  defaultValue: string;
   required?: boolean;
-  readonly?: boolean;
 };
 
-interface IOption {
-  name: string;
-  value: string;
-}
-
-const FormSelect = ({ type, name, label, options, className, required }: TInputProps) => {
+const FormFileInput = ({ name, label, accept }: TInputProps) => {
   const {
     formState: { errors },
   } = useFormContext();
@@ -47,6 +38,12 @@ const FormSelect = ({ type, name, label, options, className, required }: TInputP
       typeof errorObj === "object" && errorObj.message ? (errorObj.message as string) : undefined; //Assign error base on value type
   }
 
+  const handle_key_press = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevent form submission on Enter key press
+    }
+  };
+
   return (
     <Controller
       name={name}
@@ -58,22 +55,14 @@ const FormSelect = ({ type, name, label, options, className, required }: TInputP
                 {label}
               </label>
             )}
-            <select
-              className={
-                className ||
-                "w-full mt-1 px-2 py-3 rounded-lg border  dark:bg-dark_color focus:outline-none focus:border-spacing-2    font-medium outline-primary-color outline-2"
-              }
-              {...field}
-              value={field.value || ""}
-              id={name}
-              required={required}
-            >
-              {options.map((option, index) => (
-                <option value={option.value} key={"option" + (index + 1)}>
-                  {option.name}
-                </option>
-              ))}
-            </select>
+            <input
+              type="file"
+              onChange={(e) => {
+                const file = e.target.files;
+                if (file) field.onChange(file);
+              }}
+              accept={accept}
+            />
             {error && <p className=" text-red-600 mt-1">{error}</p>}
           </div>
         );
@@ -82,4 +71,4 @@ const FormSelect = ({ type, name, label, options, className, required }: TInputP
   );
 };
 
-export default FormSelect;
+export default FormFileInput;
