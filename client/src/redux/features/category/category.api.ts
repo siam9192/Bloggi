@@ -27,7 +27,22 @@ const categoryApi = baseApi.injectEndpoints({
         return response;
       },
     }),
+    getCategoriesForManage: builder.query({
+      query: () => {
+        return {
+          url: `/categories/manage`,
+          method: "GET",
+        };
+      },
+      transformResponse: (response: IResponse<ICategory[]>) => {
+        return response;
+      },
+    }),
   }),
 });
 
-export const { useGetPopularCategoriesQuery, useGetFeaturedCategoriesQuery } = categoryApi;
+export const {
+  useGetPopularCategoriesQuery,
+  useGetFeaturedCategoriesQuery,
+  useGetCategoriesForManageQuery,
+} = categoryApi;

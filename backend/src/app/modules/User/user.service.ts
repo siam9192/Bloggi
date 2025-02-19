@@ -42,7 +42,7 @@ const createStaffIntoDB = async (data: ICreateStaffData) => {
 
     const userProfile = {
       ...data.name,
-      profile_photo: "dee",
+      profile_photo: data.profile_photo,
       user_id: userCreatedData.id,
     };
 
@@ -91,7 +91,7 @@ const createAuthorIntoDB = async (data: ICreateAuthorData) => {
     const userProfile = {
       ...data.name,
       bio: data.bio,
-      profile_photo: "dee",
+      profile_photo: data.profile_photo,
       user_id: userCreatedData.id,
     };
 
@@ -100,6 +100,7 @@ const createAuthorIntoDB = async (data: ICreateAuthorData) => {
       data: userProfile,
     });
 
+   if(data.social_links && data.social_links.length){
     const authorSocialLinks = data.social_links.map((ele) => ({
       ...ele,
       author_id: userCreatedProfile.id,
@@ -110,6 +111,7 @@ const createAuthorIntoDB = async (data: ICreateAuthorData) => {
         data: authorSocialLinks,
       });
     }
+   }
 
     return {
       ...userCreatedData,
@@ -191,8 +193,81 @@ const getUsersFromDB = async (
     }
   }
 
+
+  if(searchTerm){
+    andConditions.push({
+      OR:[
+        {
+          author:{
+          OR:[
+          {
+            first_name:{
+              contains:searchTerm,
+              mode:'insensitive'
+            }
+          },
+          {
+           last_name:{
+              contains:searchTerm,
+              mode:'insensitive'
+            }
+          }
+          ]
+          }
+        },
+        {
+          reader:{
+          OR:[
+          {
+            first_name:{
+              contains:searchTerm,
+              mode:'insensitive'
+            }
+          },
+          {
+           last_name:{
+              contains:searchTerm,
+              mode:'insensitive'
+            }
+          }
+          ]
+          }
+        },
+        {
+          staff:{
+          OR:[
+          {
+            first_name:{
+              contains:searchTerm,
+              mode:'insensitive'
+            }
+          },
+          {
+           last_name:{
+              contains:searchTerm,
+              mode:'insensitive'
+            }
+          }
+          ]
+          }
+        },
+        {
+          email:{
+            contains:searchTerm,
+            mode:'insensitive'
+          }
+        }
+      ]
+    })
+  }
+
+
+
   const whereConditions: Prisma.UserWhereInput = {
     AND: andConditions,
+    status:{
+      not:"Deleted"
+    }
   };
 
   const users = await prisma.user.findMany({
@@ -216,6 +291,7 @@ const getUsersFromDB = async (
 
   const total = await prisma.user.count({
     where: whereConditions,
+    
   });
 
   const meta = {

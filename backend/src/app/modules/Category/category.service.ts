@@ -297,11 +297,120 @@ const getFeaturedCategoriesFromDB = async () => {
   });
 };
 
+const getCategoriesForManageFromDB =async (
+  filterRequest: ICategoryFilterRequest,
+  options: IPaginationOptions,
+) => {
+  const { searchTerm, ...othersFilterData } = filterRequest;
+  const { limit, skip, page } = calculatePagination(options);
+
+  // If category parentId exist the typecast it number => string
+  if (othersFilterData.parentId) {
+    othersFilterData.parentId = Number(othersFilterData.parentId);
+  }
+
+  const andConditions: Prisma.CategoryWhereInput[] = [];
+
+  if (searchTerm) {
+    const blogSearchableFields = ["name"];
+    andConditions.push({
+      OR: [
+        ...blogSearchableFields.map((field) => ({
+          [field]: {
+            contains: searchTerm,
+            mode: "insensitive",
+          },
+        })),
+      ],
+    });
+  }
+
+  if (othersFilterData && Object.keys(othersFilterData).length) {
+    andConditions.push({
+      AND: Object.keys(othersFilterData).map((key) => ({
+        [key]: {
+          equals: (othersFilterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.CategoryWhereInput = {
+    AND: andConditions,
+  };
+
+  const data = await prisma.category.findMany({
+    where: {
+      ...whereConditions,
+    },
+    select: {
+      id: true,
+
+      parent: {
+        include: {
+          parent: {
+            include: {
+              parent: {
+                include: {
+                  parent: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      name: true,
+      slug: true,
+      image_url:true,
+      created_at:true,
+      updated_at:true
+    },
+  });
+
+  const processData = data.map((item) => {
+    let str;
+    const names: string[] = [];
+    if (item.parent) {
+      let loopParent: any = item.parent;
+      while (loopParent) {
+        names.push(loopParent.name);
+        loopParent = loopParent.parent;
+      }
+    }
+    str = [...names, item.name].join("/");
+    return {
+      id: item.id,
+      name: item.name,
+      slug: item.slug,
+      image_url:item.image_url,
+      hierarchyString: str,
+      created_at:item.created_at,
+      updated_at:item.updated_at,
+    };
+  });
+
+  const total = await prisma.category.count({
+    where: whereConditions,
+  });
+
+  const meta = {
+    page,
+    limit,
+    total,
+  };
+
+  return {
+    meta,
+    data: processData,
+  };
+};
+
 const CategoryServices = {
   createCategoryIntoDB,
   getCategoriesFromDB,
   getPopularCategoriesFromDB,
   getFeaturedCategoriesFromDB,
+  getCategoriesForManageFromDB,
   updateCategoryIntoDB,
   deleteCategoryByIdFromDB,
 };

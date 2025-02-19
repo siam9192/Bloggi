@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const NameValidationSchema = z.object({
-  first_name: z.string({ required_error: "First Name is required" }),
-  last_name: z.string({ required_error: "Last Name is required" }),
+  first_name: z.string({ required_error: "First Name is required" }).max(15).min(2),
+  last_name: z.string({ required_error: "Last Name is required" }).max(15).min(2),
 });
 
 export const AddressValidationSchema = z.object({

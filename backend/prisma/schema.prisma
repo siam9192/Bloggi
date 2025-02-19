@@ -228,6 +228,7 @@ model Plan {
    discount_type PlanDiscountType
    features PlanFeature[]
    validity_days Int
+   status PlanStatus @default(Active)
    created_at DateTime @default(now())
    updated_at DateTime @updatedAt
    subscriptions Subscription[]
@@ -388,4 +389,11 @@ enum PaymentStatus {
 enum FollowerStatus {
   Active
   Blocked
+}
+
+
+enum PlanStatus {
+  Active
+  Inactive
+  Deleted
 }

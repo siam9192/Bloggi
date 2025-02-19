@@ -1,6 +1,6 @@
 "use client";
-import Users from "@/components/sections/Users";
-import UsersFilterBox from "@/components/ui/UsersFilterBox";
+import ManagePlans from "@/components/sections/ManagePlans";
+import ManagePaymentsFilterBox from "@/components/ui/ManagePaymentsFilterBox";
 import UsersSearchTermInput from "@/components/ui/UsersSearchTermInput";
 import React from "react";
 
@@ -10,10 +10,10 @@ const page = () => {
       <div>
         <div className=" flex justify-between items-center md:p-5 p-3 bg-white rounded-md">
           <UsersSearchTermInput />
-          <UsersFilterBox />
+          <ManagePaymentsFilterBox />
         </div>
 
-        <Users />
+        <ManagePlans />
       </div>
     </div>
   );

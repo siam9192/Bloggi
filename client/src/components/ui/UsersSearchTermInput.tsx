@@ -32,7 +32,7 @@ const UsersSearchTermInput = () => {
       </span>
       <input
         type="text"
-        placeholder="Enter name or email"
+        placeholder="Enter keyword"
         className=" w-full border-none outline-none"
         onChange={(e) => setSearchTermInputValue(e.target.value)}
       />

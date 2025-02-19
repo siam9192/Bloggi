@@ -10,7 +10,7 @@ router.get(
 );
 router.get("/ispn/ssl", PaymentControllers.validateSSLSubscriptionPayment);
 router.get("/my", auth(UserRole.Reader), PaymentControllers.getMyPayments);
-
+router.get("/manage",auth(UserRole.Admin,UserRole.Moderator,UserRole.Admin),PaymentControllers.getPayments)
 const PaymentRouter = router;
 
 export default PaymentRouter;

@@ -30,7 +30,7 @@ const CreateAuthorValidation = z.object({
   password: PasswordValidation,
   profile_photo: z.string().url(),
   bio: z.string().min(20).max(2000),
-  social_links: z.array(SocialLinkValidation).default([]),
+  social_links: z.array(SocialLinkValidation).optional().default([]),
 });
 
 const ChangeUserStatusValidation = z.object({

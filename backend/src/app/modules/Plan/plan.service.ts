@@ -1,3 +1,5 @@
+import { calculatePagination } from "../../helpers/paginationHelper";
+import { IPaginationOptions } from "../../interfaces/pagination";
 import prisma from "../../shared/prisma";
 import { ICreatePlanPayload } from "./plan.interface";
 
@@ -39,9 +41,44 @@ const getPlansFromDB = async () => {
   });
 };
 
+const getPlansForManageFromDB = async (paginationOptions:IPaginationOptions) => {
+  const {page,skip,limit} = calculatePagination(paginationOptions);
+  const data =  await prisma.plan.findMany({
+    include: {
+      features: true,
+      _count:{
+        select:{
+          subscriptions:true
+        }
+      }
+    },
+    orderBy: {
+      name: "asc",
+    },
+    take:limit,
+    skip
+  });
+  
+
+  const total  = await prisma.payment.count()
+
+  const meta = {
+    page,
+    limit,
+    total
+  }
+ 
+  return {
+    data,
+    meta
+  }
+};
+
+
 const PlanServices = {
   createPlanIntoDB,
   getPlansFromDB,
+  getPlansForManageFromDB
 };
 
 export default PlanServices;

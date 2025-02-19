@@ -30,4 +30,5 @@ export interface IFilterPayments {
   startDate?: string;
   endDate?: string;
   status?: `${PaymentStatus}`;
+  method?: `${PaymentMethod}`;
 }

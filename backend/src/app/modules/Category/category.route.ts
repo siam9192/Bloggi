@@ -13,6 +13,7 @@ router.post(
 router.get("/", CategoryControllers.getCategories);
 router.get("/popular", CategoryControllers.getPopularCategories);
 router.get("/featured", CategoryControllers.getFeaturedCategories);
+router.get("/manage",CategoryControllers.getCategoriesForManage)
 router.put(
   "/",
   validateRequest(CategoryValidations.UpdateCategoryValidationSchema),

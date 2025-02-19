@@ -210,6 +210,7 @@ const updateMyProfileIntoDB = async (req: Request) => {
   // Update staff data
   else {
     const data = req.body as IUpdateStaffProfileData;
+    console.log(data)
     ProfileValidations.UpdateStaffProfileValidation.parse(data);
     result = await prisma.staff.updateMany({
       where: {

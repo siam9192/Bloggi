@@ -691,7 +691,7 @@ const getBlogsForManageFromDB = async (
     AND: andConditions,
   };
 
-  const data = await prisma.blog.findMany({
+  const blogs = await prisma.blog.findMany({
     where: whereConditions,
     skip,
     take: limit,
@@ -702,37 +702,26 @@ const getBlogsForManageFromDB = async (
             publish_date: "desc",
           },
     include: {
-      author: {
-        select: {
-          first_name: true,
-          last_name: true,
-          profile_photo: true,
-        },
-      },
+      author:true,
       category: {
         select: {
           name: true,
         },
       },
-      tags: true,
+      _count: true,
     },
   });
 
-  const result = data.map((item) => {
-    const author = item.author;
+  
+  const result = blogs.map((item) => {
+    const {author,...others} = item;
     return {
-      title: item.title,
-      short_description: item.short_description,
-      featured_image: item.featured_image,
-      slug: item.slug,
-      likes_count: item.likes_count,
-      dislikes_count: item.dislikes_count,
-      category: item.category.name,
+        ...others,
       author: {
-        full_name: author.first_name + " " + author.last_name,
+        id:author.id,
+        full_name: [author.first_name,author.last_name].join(" "),
         profile_photo: author.profile_photo,
       },
-      created_at: item.created_at,
     };
   });
 
@@ -1190,7 +1179,6 @@ const getBlogStatesFromDB = async (id: string | number) => {
 const BlogServices = {
   createBlogIntoDB,
   getBlogsFromDB,
-
   getBlogByIdFromDB,
   getBlogForReadBySlugFromDB,
   getRelatedBlogsFromDB,

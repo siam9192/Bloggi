@@ -5,6 +5,7 @@ import { EUserRole } from "@/types/user.type";
 import React from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import DashboardResponsiveSidebar from "../sidebar/DashboardResponsiveSidebar";
+import NotificationBar from "../ui/NotificationBar";
 
 function DashboardHeader() {
   const { user } = useCurrentUser();
@@ -45,6 +46,7 @@ function DashboardHeader() {
               className="w-60  border-none outline-none bg-transparent font-medium placeholder:font-normal placeholder:text-gray-700"
             />
           </div>
+          <NotificationBar />
           <img src={profile?.profile_photo} alt="" className="size-12 rounded-full  border-2" />
         </div>
       </div>

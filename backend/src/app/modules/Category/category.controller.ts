@@ -64,12 +64,30 @@ const updateCategory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getCategoriesForManage = catchAsync(async (req: Request, res: Response) => {
+  const filterOptions = Pick(req.query, ["searchTerm", "parentId"]);
+  const options = Pick(req.query, paginationOptionKeys);
+  const result = await CategoryServices.getCategoriesForManageFromDB(
+    filterOptions,
+    options as any,
+  );
+
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.OK,
+    message: "Categories retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
+
 const CategoryControllers = {
   createCategory,
   getCategories,
   getPopularCategories,
   getFeaturedCategories,
   updateCategory,
+  getCategoriesForManage
 };
 
 export default CategoryControllers;

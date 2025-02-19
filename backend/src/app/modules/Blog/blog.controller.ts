@@ -94,6 +94,7 @@ const getBlogsForManage = catchAsync(async (req: Request, res: Response) => {
   ]);
   const options = getPaginationOptions(req.query);
   const result = await BlogServices.getBlogsForManageFromDB(filter, options);
+  
   sendSuccessResponse(res, {
     statusCode: httpStatus.OK,
     message: "Blogs retrieved successfully",

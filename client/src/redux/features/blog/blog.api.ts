@@ -17,6 +17,17 @@ const blogApi = baseApi.injectEndpoints({
         return response;
       },
     }),
+    getBlogsForManage: builder.query({
+      query: (params: IParam[]) => {
+        const paramsString = paramsToString(params);
+        return {
+          url: `/blogs/manage?${paramsString}`,
+        };
+      },
+      transformResponse: (response: IResponse<IBlog[]>) => {
+        return response;
+      },
+    }),
     getMyBlogs: builder.query({
       query: (params: IParam[]) => {
         const paramsString = paramsToString(params);
@@ -105,6 +116,7 @@ const blogApi = baseApi.injectEndpoints({
 
 export const {
   useGetBlogsQuery,
+  useGetBlogsForManageQuery,
   useGetRelatedBlogsQuery,
   useGetPopularBlogsQuery,
   useGetMyBlogsQuery,

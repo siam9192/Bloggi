@@ -228,8 +228,8 @@ const getPaymentsFromDB = async (
 
   const andConditions: Prisma.PaymentWhereInput[] = [];
 
-  const { minAmount, maxAmount, startDate, endDate, status } = filter;
-
+  const { minAmount, maxAmount, startDate, endDate, status,method } = filter;
+ 
   if (minAmount || maxAmount) {
     const validate = (amount: string) => {
       return !isNaN(parseInt(amount));
