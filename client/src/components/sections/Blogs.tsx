@@ -31,6 +31,9 @@ const Blogs = () => {
 
   if (!isLoading && (!meta || !blogs)) throw new Error();
 
+  const showingFrom = meta && meta.total ? (meta.page - 1) * meta.limit + 1 : 0;
+  const showingTo = meta ? Math.min(meta.page * meta.limit, meta.total) : 0;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center  bg-white shadow md:p-5 p-2 ">
@@ -39,7 +42,7 @@ const Blogs = () => {
         </div>
         <div>
           <p>
-            Showing {(meta?.limit || 0) * (meta?.page || 0)} of {meta?.total || 0} results
+            Showing {showingFrom} of {showingTo} results
           </p>
         </div>
         <div className="md:text-3xl text-2xl space-x-2 md:block hidden ">

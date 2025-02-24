@@ -3,26 +3,18 @@ import { BlogComments } from "@/components/sections/BlogComments";
 import RelatedBlogs from "@/components/sections/RelatedBlogs";
 import Ads from "@/components/ui/Ads";
 import BlogContent from "@/components/ui/BlogContent";
-import PremiumContentMessage from "@/components/ui/PremiumContentMessage";
 import { getBlogBySlugForRead } from "@/services/blog.service";
 import React from "react";
-import { AiOutlineDislike, AiOutlineLike } from "react-icons/ai";
-import { BsBookmark } from "react-icons/bs";
 import { PageProps } from "../../../../../../.next/types/app/layout";
 import "@/styles/BlogContent.css";
 import BlogReactions from "@/components/sections/BlogReactions";
+import PageNotFound from "@/components/ui/PageNotFound";
+import AuthorFollowToggleButton from "@/components/ui/AuthorFollowToggleButton";
+import BlogAuthor from "@/components/ui/BlogAuthor";
 const page = async ({ params }: PageProps) => {
-  const tags = [
-    "blogging",
-    "content-creation",
-    "SEO",
-    "writing-tips",
-    "digital-marketing",
-    "audience-engagement",
-  ];
-
   let blog;
   let slug;
+
   try {
     slug = (await params).slug;
     const res = await getBlogBySlugForRead(slug);
@@ -32,7 +24,7 @@ const page = async ({ params }: PageProps) => {
     blog = res.data;
   } catch (error) {}
 
-  if (!blog) return;
+  if (!blog) return <PageNotFound />;
 
   //   return <PremiumContentMessage/>
   return (
@@ -90,19 +82,7 @@ const page = async ({ params }: PageProps) => {
                 <h3 className="text-gray-700 font-semibold text-[0.9rem] ">{blog.views_count}</h3>
               </div>
             </div>
-            <div className="px-5 py-10  bg-[#F5F9FA] space-y-3">
-              <p className="text-gray-500 uppercase">Author</p>
-              <div className=" mt-2 flex items-center gap-2">
-                <img src={blog.author.profile_photo} className="size-16 rounded-full" alt="" />
-                <div className="space-y-1">
-                  <h2>{blog.author.full_name}</h2>
-                  <p className="text-[0.9rem] font-medium text-gray-600">
-                    {blog.author.followers_count} Followers
-                  </p>
-                </div>
-              </div>
-              <button className="px-4 py-2 w-full bg-primary_color text-white  ">Follow</button>
-            </div>
+            <BlogAuthor author={blog.author} />
           </div>
         </div>
         <div className="mt-14 space-y-10">

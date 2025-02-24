@@ -55,7 +55,7 @@ const CommentCard = ({ comment }: IProps) => {
           />
 
           <div className="flex items-center gap-2">
-            <div className="w-fit flex items-center gap-1">
+            {/* <div className="w-fit flex items-center gap-1">
               <span className="text-2xl text-gray-400">
                 <AiOutlineLike />
               </span>
@@ -66,7 +66,7 @@ const CommentCard = ({ comment }: IProps) => {
                 <AiOutlineDislike />
               </span>
               <span className="text-primary_color">20</span>
-            </div>
+            </div> */}
 
             <CommentReplayBox
               commentId={comment.id}

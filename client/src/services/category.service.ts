@@ -13,3 +13,12 @@ export const getCategories = async (params: IParam[]) => {
     return error?.response as IResponse<null>;
   }
 };
+
+export const getFeaturedCategories = async () => {
+  try {
+    const res = await axiosInstance.get("/categories/featured");
+    return res.data as IResponse<ICategory[]>;
+  } catch (error: any) {
+    return error?.response as IResponse<null>;
+  }
+};

@@ -37,7 +37,6 @@ export const getBlogs = async (params: IParam[]) => {
 export const getBlogBySlugForRead = async (slug: string) => {
   try {
     const res = await axiosInstance.get("/blogs/read/" + slug);
-
     return res.data as IResponse<IBlog>;
   } catch (error: any) {
     return error?.response.data as IResponse<null>;

@@ -1,6 +1,6 @@
 "use client";
 import { addToBookmark, removeFromBookmark } from "@/services/bookmark.service";
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 import { IoBookmark, IoBookmarkOutline } from "react-icons/io5";
 import errorToast from "../toast/ErrorToast";
 

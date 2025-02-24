@@ -17,7 +17,7 @@ const RelatedBlogs = ({ slug }: IProps) => {
     <div className="py-20">
       <h1 className="text-3xl md:text-4xl font-jost font-extrabold uppercase">Related Posts</h1>
       {blogs?.length ? (
-        <div className="mt-10 grid lg:grid-cols-4 md:grid-cols-3  grid-cols-2 gap-2 md:gap-5 lg:gap-10">
+        <div className="mt-10 grid lg:grid-cols- md:grid-cols-3  grid-cols-2 gap-2 md:gap-5 lg:gap-10">
           {blogs?.map((blog, index) => <BlogCard blog={blog} key={"recent-blog" + (index + 1)} />)}
         </div>
       ) : (

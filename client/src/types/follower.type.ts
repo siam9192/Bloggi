@@ -7,6 +7,19 @@ export interface IFollower {
   author: IAuthor;
 }
 
+export interface IFollowingAuthor {
+  author: {
+    id: number;
+    full_name: string;
+    profile_photo: string;
+    _count: {
+      followers: number;
+      blogs: number;
+    };
+  };
+  created_at: string;
+}
+
 export interface IMyFollower {
   reader_id: number;
   full_name: string;

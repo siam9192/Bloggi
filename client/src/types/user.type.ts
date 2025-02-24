@@ -6,7 +6,7 @@ import { IBookmark } from "./bookmark.type";
 
 export interface IUser {
   id: number;
-  role: `${EUserRole}`;
+  role: TUserRole;
   email: string;
   password: string;
   google_id?: string;
@@ -88,6 +88,8 @@ export interface ISocialLink {
   platform: `${ESocialPlatform}`;
   url: string;
 }
+
+export type TUserRole = `${EUserRole}`;
 
 export enum EUserStatus {
   Active = "Active",

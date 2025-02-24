@@ -7,9 +7,10 @@ import PlanPurchaseButton from "../ui/PlanPurchaseButton";
 
 interface IProps {
   plan: IPlan;
+  disableButton?: boolean;
 }
 
-const PricingCard = ({ plan }: IProps) => {
+const PricingCard = ({ plan, disableButton }: IProps) => {
   return (
     <div className="p-5 bg-white space-y-4 font-jost  shadow rounded-md">
       <div className="space-y-3">
@@ -21,7 +22,13 @@ const PricingCard = ({ plan }: IProps) => {
         <h1 className="text-4xl text-primary_color font-bold">
           ${plan.price}/<span className="text-xl text-blue-500">{plan.validity_days} Days</span>
         </h1>
-        <PlanPurchaseButton planId={plan.id} />
+        {!plan.is_active ? (
+          <PlanPurchaseButton disabled={disableButton} planId={plan.id} />
+        ) : (
+          <button disabled className="px-6 py-3 rounded-md bg-primary_color text-white">
+            Already activate
+          </button>
+        )}
       </div>
 
       <div className="mt-5 space-y-2">

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import SelectCategory from "./SelectCategory";
 import { useForm } from "react-hook-form";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -11,32 +11,55 @@ const BlogFilterBox = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [selectedCategory, setSelectedCategory] = useState<IRetrieveCategory | null>(null);
 
   const onSubmit = (values: any) => {
     const params: IParam[] = Object.entries(values).map(([key, value]) => ({
       name: key,
       value: value as any,
     }));
+
+    if (selectedCategory) {
+      params.push({
+        name: "categories",
+        value: selectedCategory.id,
+      });
+    }
     const acceptableParamsName = [
       "searchTerm",
-      "from",
-      "to",
+      "startDate",
+      "endDate",
+      "categories",
       "type",
       "page",
       "sortBy",
       "sortOrder",
     ];
+
     const url = getSearchUrl(pathname, searchParams, params, acceptableParamsName);
     router.push(url);
   };
-  let defaultValues: Record<string, string> = {};
-  searchParams.forEach((value, key) => {
-    defaultValues[key] = value;
-  });
+  let defaultValues: Record<string, string> = {
+    searchTerm: searchParams.get("searchTerm") || "",
+    startDate: searchParams.get("startDate") || "",
+    endDate: searchParams.get("endDate") || "",
+    type: searchParams.get("type") || "",
+    sortBy: searchParams.get("sortBy") || "",
+    sortOrder: searchParams.get("sortOrder") || "",
+  };
 
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, reset } = useForm({
     defaultValues,
   });
+
+  const handelCategoryOnChange = (category: IRetrieveCategory) => {
+    setSelectedCategory(category);
+  };
+
+  const handelReset = () => {
+    reset();
+    setSelectedCategory(null);
+  };
 
   return (
     <form
@@ -54,7 +77,7 @@ const BlogFilterBox = () => {
       </div>
       <div className="space-y-2">
         <label className="font-medium text-xl ">Select Category:</label>
-        <SelectCategory />
+        <SelectCategory onChange={handelCategoryOnChange} />
       </div>
       <div className="space-y-2">
         <label className="font-medium text-xl ">Post From:</label>
@@ -179,7 +202,11 @@ const BlogFilterBox = () => {
         </div>
       </div>
       <div className=" grid grid-cols-2 ">
-        <button type="reset" className="px-4 py-3 bg-red-500 text-white  w-full">
+        <button
+          onClick={handelReset}
+          type="button"
+          className="px-4 py-3 bg-red-500 text-white  w-full"
+        >
           Reset
         </button>
         <button type="submit" className="px-6 py-3 bg-primary_color text-white  w-full">

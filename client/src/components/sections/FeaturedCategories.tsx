@@ -1,6 +1,4 @@
-"use client";
-import popularCategories from "@/data/poular-catgories.data";
-import { useGetPopularCategoriesQuery } from "@/redux/features/category/category.api";
+import { getFeaturedCategories } from "@/services/category.service";
 import Link from "next/link";
 import React, { CSSProperties } from "react";
 
@@ -19,10 +17,9 @@ const getStyle = (imageUrl: string): CSSProperties => {
   };
 };
 
-function FeaturedCategories() {
-  const { data, isLoading } = useGetPopularCategoriesQuery(undefined);
-
-  const categories = data?.data;
+async function FeaturedCategories() {
+  const res = await getFeaturedCategories();
+  const categories = res.data || [];
 
   return (
     <div className="py-20">

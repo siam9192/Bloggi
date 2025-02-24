@@ -11,6 +11,7 @@ export interface IPlan {
   status: TPlanStatus;
   created_at: string;
   updated_at: string;
+  is_active: boolean;
   subscriptions: ISubscription[];
   _count: {
     subscriptions: number;

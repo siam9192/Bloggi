@@ -31,9 +31,10 @@ const OptionText = ({ word, inputValue }: IOptionsProps) => {
 
 interface IProps {
   defaultValue?: IRetrieveCategory;
+  onChange?(value: IRetrieveCategory): void;
 }
 
-function SelectCategory({ defaultValue }: IProps) {
+function SelectCategory({ defaultValue, onChange }: IProps) {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -96,6 +97,7 @@ function SelectCategory({ defaultValue }: IProps) {
     if (input) {
       input.value = category.hierarchyString;
     }
+    onChange && onChange(category);
   };
 
   return (
@@ -133,15 +135,17 @@ function SelectCategory({ defaultValue }: IProps) {
       </div>
       {isOpen && (
         <div className=" absolute  top-14 w-full bg-black rounded-xl max-h-60 overflow-y-scroll  no-scrollbar p-2 z-40">
-          {categories.map((category) => (
-            <button
-              onClick={() => handelOnSelect(category)}
-              key={category.id}
-              className="text-[0.9rem]text-primary_color px-2 py-3 block mt-2 hover:bg-white  hover:text-black text-white w-full text-start rounded-md"
-            >
-              <OptionText word={category.hierarchyString} inputValue={value} />
-            </button>
-          ))}
+          {categories
+            .filter((category) => selectedCategory?.id !== category.id)
+            .map((category) => (
+              <button
+                onClick={() => handelOnSelect(category)}
+                key={category.id}
+                className="text-[0.9rem]text-primary_color px-2 py-3 block mt-2 hover:bg-white  hover:text-black text-white w-full text-start rounded-md"
+              >
+                <OptionText word={category.hierarchyString} inputValue={value} />
+              </button>
+            ))}
           {value && !isLoading && !categories.length && (
             <div className=" py-5 flex  text-center flex-col justify-center items-center gap-2 ">
               <span className="text-5xl text-white">

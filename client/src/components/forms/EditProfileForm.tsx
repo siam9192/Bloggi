@@ -69,10 +69,8 @@ const EditProfileForm = ({ onSuccess }: IProps) => {
   };
 
   const defaultValues = {
-    
-      first_name: profile?.first_name,
-      last_name: profile?.last_name,
-  
+    first_name: profile?.first_name,
+    last_name: profile?.last_name,
   };
 
   const validation = z.object({

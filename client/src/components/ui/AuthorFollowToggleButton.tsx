@@ -6,9 +6,20 @@ import errorToast from "../toast/ErrorToast";
 interface IProps {
   authorId: number;
   followingStatus: boolean;
+  onFollow?(): void;
+  onUnFollow?(): void;
+  followButtonClassName?: string;
+  unFollowButtonClassName?: string;
 }
 
-const AuthorFollowToggleButton = ({ authorId, followingStatus }: IProps) => {
+const AuthorFollowToggleButton = ({
+  authorId,
+  followingStatus,
+  onFollow,
+  onUnFollow,
+  followButtonClassName,
+  unFollowButtonClassName,
+}: IProps) => {
   const [isFollowing, setIsFollowing] = useState(followingStatus);
   const handelFollow = async () => {
     try {
@@ -17,6 +28,7 @@ const AuthorFollowToggleButton = ({ authorId, followingStatus }: IProps) => {
         throw new Error();
       }
       setIsFollowing(true);
+      onFollow && onFollow();
     } catch (error) {
       errorToast("Something went wrong");
     }
@@ -29,6 +41,7 @@ const AuthorFollowToggleButton = ({ authorId, followingStatus }: IProps) => {
         throw new Error();
       }
       setIsFollowing(false);
+      onUnFollow && onUnFollow();
     } catch (error) {
       errorToast("Something went wrong");
     }
@@ -38,14 +51,20 @@ const AuthorFollowToggleButton = ({ authorId, followingStatus }: IProps) => {
       {isFollowing ? (
         <button
           onClick={handelUnFollow}
-          className="mt-3 bg-red-500 w-full py-2 text-white font-jost rounded-full"
+          className={
+            unFollowButtonClassName ||
+            "mt-3 bg-red-500 w-full py-2 text-white font-jost rounded-full"
+          }
         >
           Unfollow
         </button>
       ) : (
         <button
           onClick={handelFollow}
-          className="mt-3 bg-primary_color w-full py-2 text-white font-jost rounded-full"
+          className={
+            followButtonClassName ||
+            "mt-3 bg-primary_color w-full py-2 text-white font-jost rounded-full"
+          }
         >
           Follow
         </button>

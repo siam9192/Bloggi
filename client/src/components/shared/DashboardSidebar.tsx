@@ -9,12 +9,14 @@ import { CiLogout } from "react-icons/ci";
 import { useCurrentUser } from "@/provider/CurrentUserProvider";
 import { EUserRole } from "@/types/user.type";
 import superAdminDashboardRoutes from "@/routes/super-admin.dashboard.route";
+import readerDashboardRoutes from "@/routes/reader.dashboard.route";
+import LogoutButton from "../ui/LogoutButton";
 
 type TProps = {
   role: "SuperAdmin" | "Admin" | "Author";
 };
 function DashboardSidebar() {
-  const { user, isLoading } = useCurrentUser();
+  const { user } = useCurrentUser();
   const role = user!.role;
   const pathName = usePathname();
   let routes: any[];
@@ -22,9 +24,9 @@ function DashboardSidebar() {
     routes = authorDashboardRoutes;
   } else if (user?.role === EUserRole.SuperAdmin) {
     routes = superAdminDashboardRoutes;
-  } else {
-    routes = [];
-  }
+  } else if (user?.role === EUserRole.Reader) {
+    routes = readerDashboardRoutes;
+  } else routes = [];
 
   return (
     <div
@@ -59,12 +61,7 @@ function DashboardSidebar() {
           })}
         </div>
       </div>
-      <button className="flex items-center gap-2 text-xl text-red-700 font-medium">
-        <span className="text-3xl">
-          <CiLogout />
-        </span>
-        <span>Logout</span>
-      </button>
+      <LogoutButton />
     </div>
   );
 }

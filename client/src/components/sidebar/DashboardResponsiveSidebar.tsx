@@ -30,7 +30,7 @@ const DashboardResponsiveSidebar = () => {
       </button>
 
       <div
-        className={`fixed w-full h-full top-0 p-10 bg-primary_color bg-opacity-30  ${isOpen ? "left-0" : "-left-[200%]"} duration-150 `}
+        className={`fixed w-full h-full top-0 p-10 bg-primary_color bg-opacity-30 z-50  ${isOpen ? "left-0" : "-left-[200%]"} duration-150 `}
       >
         <DashboardSidebar />
       </div>

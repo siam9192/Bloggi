@@ -130,8 +130,8 @@ const NotificationBar = () => {
       link: "/verify-email",
     },
   ];
-  const [notifications,setNotifications] = useState(notification)
-  const [isLoading,setIsLoading] = useState(false);
+  const [notifications, setNotifications] = useState(notification);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const barRef = useRef<HTMLDivElement>(null);
   const handelOnClick = (notification: any) => {
@@ -141,16 +141,16 @@ const NotificationBar = () => {
   };
 
   useEffect(() => {
-    const bar = barRef.current
+    const bar = barRef.current;
 
     if (!bar) return;
     const handler = (event: Event) => {
       if (bar.scrollTop + bar.clientHeight >= bar.scrollHeight) {
-        console.log("Rechead")
-       const arr =  notifications;
+        console.log("Rechead");
+        const arr = notifications;
 
-       arr.push(notification[1])
-       setNotifications(arr)
+        arr.push(notification[1]);
+        setNotifications(arr);
       }
     };
 
@@ -160,7 +160,7 @@ const NotificationBar = () => {
         setIsOpen(false);
       }
     };
-  
+
     // bar.addEventListener("scroll", handler);
     document.addEventListener("click", handler2);
 
@@ -168,20 +168,16 @@ const NotificationBar = () => {
       // bar.removeEventListener("scroll", handler);
       document.removeEventListener("click", handler2);
     };
-  }, [isOpen,barRef.current?.onscroll]);
+  }, [isOpen, barRef.current?.onscroll]);
 
- 
   const handleOnScroll = (event: UIEvent<HTMLDivElement>) => {
     const target = event.target as HTMLDivElement; // Cast to HTMLDivElement
-    
+
     if (target.scrollTop + target.clientHeight >= target.scrollHeight) {
-      setIsLoading(true)
-      setTimeout(()=>{
-        setNotifications((prevNotifications) => [
-          ...prevNotifications, 
-          notification[1] 
-        ]);
-      },10000)
+      setIsLoading(true);
+      setTimeout(() => {
+        setNotifications((prevNotifications) => [...prevNotifications, notification[1]]);
+      }, 10000);
     }
   };
 
@@ -189,7 +185,7 @@ const NotificationBar = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="text-4xl p-2  bg-gray-50  rounded-full relative"
+        className="md:text-4xl text-3xl p-2  bg-gray-50  rounded-full relative"
       >
         <PiBell />
         <div className="size-5 flex justify-center items-center bg-red-500 rounded-full absolute  -top-1  right-0 text-[0.6rem] text-white">
@@ -227,11 +223,7 @@ const NotificationBar = () => {
               </div>
             ))}
           </div>
-         {
-          isLoading &&  <p className="mt-1 text-gray-700 font-medium">
-          Loading..
-        </p>
-         }
+          {isLoading && <p className="mt-1 text-gray-700 font-medium">Loading..</p>}
         </div>
       )}
     </div>

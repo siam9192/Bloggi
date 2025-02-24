@@ -17,7 +17,7 @@ export const changeFollowerStatus = async (payload: {
 
 export const FollowAuthor = async (payload: { author_id: number }) => {
   try {
-    const response = await axiosInstance.patch("/followers", payload);
+    const response = await axiosInstance.post("/followers", payload);
     return response.data as IResponse<null>;
   } catch (error: any) {
     return error?.response as IResponse<null>;

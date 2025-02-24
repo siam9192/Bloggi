@@ -7,9 +7,14 @@ import ResponsiveNavbar from "../ui/ResponsiveNavbar";
 import { getCurrentUser } from "@/services/auth.service";
 import { EUserRole } from "@/types/user.type";
 import NotificationBar from "../ui/NotificationBar";
+import BlogSearchButton from "../ui/BlogSearchButton";
 
 const Header = async () => {
   const user = await getCurrentUser();
+  let profile;
+  if (user) {
+    profile = user.author || user.reader || user.staff;
+  }
 
   return (
     <div className=" py-3 md:py-5  border-b-2 bg-white  ">
@@ -34,15 +39,14 @@ const Header = async () => {
           </div>
         )}
         <div className="flex  items-center gap-3">
+          <BlogSearchButton />
           {user && (
             <>
               <NotificationBar />
               <Link href={`/dashboard/${user?.role.toLocaleLowerCase()}`}>
                 <img
                   className="size-12 rounded-full  border-2 border-primary_color"
-                  src={
-                    "https://img.freepik.com/free-photo/young-bearded-man-with-striped-shirt_273609-5677.jpg?semt=ais_hybrid"
-                  }
+                  src={profile?.profile_photo}
                   alt=""
                 />
               </Link>

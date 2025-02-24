@@ -1,6 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
 import { IAuthorBlog, IBlog, IBlogStates } from "@/types/blog.type";
-import { IMyFollower } from "@/types/follower.type";
 import { IParam, IResponse } from "@/types/response.type";
 import { paramsToString } from "@/utils/func";
 

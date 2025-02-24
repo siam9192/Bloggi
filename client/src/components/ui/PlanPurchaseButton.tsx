@@ -10,9 +10,10 @@ import { subscribePlan } from "@/services/subscription.service";
 
 interface IProps {
   planId: number;
+  disabled?: boolean;
 }
 
-const PlanPurchaseButton = ({ planId }: IProps) => {
+const PlanPurchaseButton = ({ planId, disabled }: IProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -49,12 +50,10 @@ const PlanPurchaseButton = ({ planId }: IProps) => {
 
       const paymentUrl = res.data?.paymentUrl;
       if (!paymentUrl) throw new Error("Payment URL is missing.");
-
-      window.location.href = paymentUrl;
-
       setTimeout(() => {
         window.location.href = window.location.origin;
-      }, 10_000);
+      }, 20000);
+      window.location.href = paymentUrl;
     } catch (error: any) {
       const errorMsg = error?.message || "An unexpected error occurred.";
       errorToast(errorMsg);
@@ -66,7 +65,8 @@ const PlanPurchaseButton = ({ planId }: IProps) => {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="px-8 py-5 bg-blue-600 hover:bg-primary_color duration-75 text-white rounded-md"
+        disabled={disabled}
+        className="px-8 py-5 bg-blue-600 disabled:bg-gray-100 disabled:text-gray-700 disabled:font-medium font-bold hover:bg-primary_color duration-75 text-white rounded-md"
       >
         Subscribe
       </button>

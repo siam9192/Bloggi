@@ -1,14 +1,6 @@
 import { getCurrentUser } from "@/services/auth.service";
 import { EUserRole, IProfile, IUser } from "@/types/user.type";
-import React, {
-  createContext,
-  ReactNode,
-  SetStateAction,
-  use,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 type TContextValue = {
   isLoading: boolean;

@@ -26,9 +26,11 @@ export interface IAuthorBlog {
 }
 
 export interface Author {
+  id: number;
   full_name: string;
   profile_photo: string;
   followers_count: number;
+  is_following: boolean;
 }
 
 export interface IBlog {
